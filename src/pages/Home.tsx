@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Handshake,
   ReceiptText,
@@ -26,7 +26,7 @@ const apps = [
     Icon: Handshake,
     gradient: "from-rose-500 to-pink-700",
     glowColor: "hsl(340, 82%, 52%)",
-    url: "https://cadastrodeliderancas.drafernandasarelli.com.br",
+    url: "https://liderancas.deputadasarelli.com.br/login",
   },
   {
     id: "financeiro",
@@ -36,7 +36,7 @@ const apps = [
     Icon: ReceiptText,
     gradient: "from-violet-500 to-purple-800",
     glowColor: "hsl(270, 76%, 53%)",
-    url: "https://financeiro.drafernandasarelli.com.br",
+    url: "https://contas.deputadasarelli.com.br/login",
   },
   {
     id: "visitas",
@@ -46,7 +46,7 @@ const apps = [
     Icon: ClipboardCheck,
     gradient: "from-red-400 to-rose-700",
     glowColor: "hsl(350, 80%, 55%)",
-    url: "https://visitas.drafernandasarelli.com.br",
+    url: "https://visitas.deputadasarelli.com.br/",
   },
   {
     id: "suplentes",
@@ -56,7 +56,7 @@ const apps = [
     Icon: UserRoundPlus,
     gradient: "from-pink-400 to-fuchsia-700",
     glowColor: "hsl(330, 76%, 55%)",
-    url: "https://suplentes.drafernandasarelli.com.br",
+    url: "https://suplentes.deputadasarelli.com.br/login",
   },
   {
     id: "computadores",
@@ -66,7 +66,7 @@ const apps = [
     Icon: Laptop,
     gradient: "from-indigo-500 to-blue-800",
     glowColor: "hsl(230, 76%, 55%)",
-    url: "https://computadores.drafernandasarelli.com.br",
+    url: "https://computadores.deputadasarelli.com.br/login",
   },
   {
     id: "dados",
@@ -76,7 +76,7 @@ const apps = [
     Icon: BarChart3,
     gradient: "from-cyan-400 to-teal-700",
     glowColor: "hsl(185, 76%, 50%)",
-    url: "https://painel.drafernandasarelli.com.br",
+    url: "https://paineldedados.deputadasarelli.com.br/login",
   },
   {
     id: "site",
@@ -86,70 +86,55 @@ const apps = [
     Icon: Globe,
     gradient: "from-pink-400 to-rose-600",
     glowColor: "hsl(340, 82%, 60%)",
-    url: "https://www.drafernandasarelli.com.br",
+    url: "https://www.deputadasarelli.com.br",
   },
 ] as const;
 
 type App = (typeof apps)[number];
 
-/* ─── floating particles ─────────────────────────────────────────── */
+/* ─── floating particles (reduced to 8 for performance) ──────────── */
+const PARTICLES = Array.from({ length: 8 }, (_, i) => ({
+  id: i,
+  left: `${(i * 12.5) % 100}%`,
+  top: `${(i * 15) % 100}%`,
+  yEnd: -80 - (i % 3) * 40,
+  xEnd: ((i % 2 === 0 ? 1 : -1) * 20),
+  dur: 8 + (i % 3) * 4,
+  del: i * 0.8,
+}));
+
 function FloatingParticles() {
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-      {Array.from({ length: 20 }).map((_, i) => (
+      {PARTICLES.map((p) => (
         <motion.div
-          key={i}
+          key={p.id}
           className="absolute w-1 h-1 rounded-full bg-primary/20"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-          }}
-          animate={{
-            y: [0, -80 - Math.random() * 120, 0],
-            x: [0, (Math.random() - 0.5) * 60, 0],
-            opacity: [0, 0.6, 0],
-            scale: [0, 1 + Math.random(), 0],
-          }}
-          transition={{
-            duration: 6 + Math.random() * 8,
-            repeat: Infinity,
-            delay: Math.random() * 6,
-            ease: "easeInOut",
-          }}
+          style={{ left: p.left, top: p.top }}
+          animate={{ y: [0, p.yEnd, 0], x: [0, p.xEnd, 0], opacity: [0, 0.6, 0] }}
+          transition={{ duration: p.dur, repeat: Infinity, delay: p.del, ease: "easeInOut" }}
         />
       ))}
     </div>
   );
 }
 
-/* ─── animated mesh gradient background ─────────────────────────── */
+/* ─── static CSS background (no JS animation = much faster) ──────── */
 function MeshBackground() {
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden">
-      {/* Main gradient orbs */}
-      <motion.div
-        className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vw] rounded-full opacity-[0.12]"
-        style={{ background: "radial-gradient(circle, hsl(340, 82%, 55%), transparent 70%)" }}
-        animate={{ x: [0, 60, -30, 0], y: [0, -40, 30, 0], scale: [1, 1.15, 0.95, 1] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+      <div
+        className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vw] rounded-full opacity-[0.12] animate-pulse"
+        style={{ background: "radial-gradient(circle, hsl(340, 82%, 55%), transparent 70%)", animationDuration: "6s" }}
       />
-      <motion.div
-        className="absolute top-[30%] -right-[15%] w-[55vw] h-[55vw] rounded-full opacity-[0.08]"
-        style={{ background: "radial-gradient(circle, hsl(270, 76%, 55%), transparent 70%)" }}
-        animate={{ x: [0, -50, 25, 0], y: [0, 45, -20, 0], scale: [1, 0.9, 1.1, 1] }}
-        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+      <div
+        className="absolute top-[30%] -right-[15%] w-[55vw] h-[55vw] rounded-full opacity-[0.08] animate-pulse"
+        style={{ background: "radial-gradient(circle, hsl(270, 76%, 55%), transparent 70%)", animationDuration: "8s", animationDelay: "2s" }}
       />
-      <motion.div
-        className="absolute -bottom-[15%] left-[20%] w-[50vw] h-[50vw] rounded-full opacity-[0.06]"
-        style={{ background: "radial-gradient(circle, hsl(200, 76%, 50%), transparent 70%)" }}
-        animate={{ x: [0, 35, -45, 0], y: [0, -25, 40, 0] }}
-        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 5 }}
+      <div
+        className="absolute -bottom-[15%] left-[20%] w-[50vw] h-[50vw] rounded-full opacity-[0.06] animate-pulse"
+        style={{ background: "radial-gradient(circle, hsl(200, 76%, 50%), transparent 70%)", animationDuration: "7s", animationDelay: "4s" }}
       />
-      {/* Subtle grain */}
-      <div className="absolute inset-0 opacity-[0.015]" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-        backgroundSize: "180px 180px",
-      }} />
     </div>
   );
 }
@@ -157,22 +142,7 @@ function MeshBackground() {
 /* ─── app card ───────────────────────────────────────────────────── */
 function AppCard({ app, index }: { app: App; index: number }) {
   const [hovered, setHovered] = useState(false);
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const rotateX = useTransform(mouseY, [-0.5, 0.5], [6, -6]);
-  const rotateY = useTransform(mouseX, [-0.5, 0.5], [-6, 6]);
-
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    mouseX.set((e.clientX - rect.left) / rect.width - 0.5);
-    mouseY.set((e.clientY - rect.top) / rect.height - 0.5);
-  }, [mouseX, mouseY]);
-
-  const handleMouseLeave = useCallback(() => {
-    mouseX.set(0);
-    mouseY.set(0);
-    setHovered(false);
-  }, [mouseX, mouseY]);
+  const handleMouseLeave = useCallback(() => setHovered(false), []);
 
   return (
     <motion.a
@@ -180,62 +150,34 @@ function AppCard({ app, index }: { app: App; index: number }) {
       target="_blank"
       rel="noopener noreferrer"
       className="group relative block"
-      style={{ perspective: 800 }}
-      initial={{ opacity: 0, y: 50, scale: 0.9 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{
-        type: "spring",
-        stiffness: 260,
-        damping: 20,
-        delay: 0.08 * index + 0.3,
-      }}
-      onMouseMove={handleMouseMove}
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={handleMouseLeave}
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.05 * index + 0.2 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={handleMouseLeave}
     >
-      <motion.div
-        className="relative overflow-hidden rounded-2xl border border-white/[0.06] backdrop-blur-sm"
-        style={{
-          rotateX,
-          rotateY,
-          transformStyle: "preserve-3d",
-          background: "linear-gradient(145deg, hsl(240 10% 8% / 0.8), hsl(240 10% 6% / 0.95))",
-        }}
-        whileHover={{ scale: 1.02 }}
-        transition={{ type: "spring", stiffness: 400, damping: 25 }}
+      <div
+        className="relative overflow-hidden rounded-2xl border border-white/[0.06] transition-transform duration-200 hover:scale-[1.02]"
+        style={{ background: "linear-gradient(145deg, hsl(240 10% 8% / 0.8), hsl(240 10% 6% / 0.95))" }}
       >
         {/* Gradient top bar */}
         <div className={`h-[3px] w-full bg-gradient-to-r ${app.gradient}`} />
 
         {/* Hover glow effect */}
-        <AnimatePresence>
-          {hovered && (
-            <motion.div
-              className="absolute inset-0 pointer-events-none"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              style={{
-                background: `radial-gradient(300px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${app.glowColor}15, transparent 60%)`,
-              }}
-            />
-          )}
-        </AnimatePresence>
+        <div
+          className={`absolute inset-0 pointer-events-none transition-opacity duration-300 ${hovered ? "opacity-100" : "opacity-0"}`}
+          style={{ background: `radial-gradient(300px circle at 50% 50%, ${app.glowColor}15, transparent 60%)` }}
+        />
 
         <div className="p-5 sm:p-6">
           {/* Icon + badge row */}
           <div className="flex items-start justify-between mb-4">
-            <motion.div
-              className={`flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${app.gradient} shadow-lg`}
-              animate={hovered ? { scale: 1.1, rotate: -5 } : { scale: 1, rotate: 0 }}
-              transition={{ type: "spring", stiffness: 400, damping: 20 }}
-              style={{
-                boxShadow: hovered ? `0 8px 30px ${app.glowColor}40` : `0 4px 15px ${app.glowColor}20`,
-              }}
+            <div
+              className={`flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${app.gradient} shadow-lg transition-transform duration-200 ${hovered ? "scale-110 -rotate-3" : ""}`}
+              style={{ boxShadow: `0 4px 15px ${app.glowColor}20` }}
             >
               <app.Icon size={22} strokeWidth={1.8} className="text-white" />
-            </motion.div>
+            </div>
 
             <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground/60 bg-white/[0.04] border border-white/[0.06] px-2.5 py-1 rounded-full">
               {app.badge}
@@ -245,12 +187,7 @@ function AppCard({ app, index }: { app: App; index: number }) {
           {/* Title */}
           <h3 className="text-[15px] font-bold text-foreground/90 mb-1 flex items-center gap-2">
             {app.title}
-            <motion.span
-              animate={hovered ? { x: 3, y: -3, opacity: 1 } : { x: 0, y: 0, opacity: 0.3 }}
-              transition={{ type: "spring", stiffness: 400, damping: 20 }}
-            >
-              <ArrowUpRight size={14} className="text-primary/60" />
-            </motion.span>
+            <ArrowUpRight size={14} className={`text-primary/60 transition-all duration-200 ${hovered ? "translate-x-0.5 -translate-y-0.5 opacity-100" : "opacity-30"}`} />
           </h3>
 
           {/* Description */}
@@ -260,19 +197,10 @@ function AppCard({ app, index }: { app: App; index: number }) {
         </div>
 
         {/* Bottom shimmer on hover */}
-        <AnimatePresence>
-          {hovered && (
-            <motion.div
-              className={`absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r ${app.gradient}`}
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: 1 }}
-              exit={{ scaleX: 0 }}
-              transition={{ duration: 0.4, ease: "easeInOut" }}
-              style={{ transformOrigin: "left" }}
-            />
-          )}
-        </AnimatePresence>
-      </motion.div>
+        <div
+          className={`absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r ${app.gradient} transition-transform duration-300 origin-left ${hovered ? "scale-x-100" : "scale-x-0"}`}
+        />
+      </div>
     </motion.a>
   );
 }
