@@ -467,7 +467,7 @@ export default function Home() {
 
         {/* ── FOOTER ── */}
         <motion.footer
-          className="max-w-6xl w-full mx-auto px-6 sm:px-10 pb-8 pt-4"
+          className="max-w-5xl w-full mx-auto px-4 sm:px-8 pb-6 pt-2"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2 }}
