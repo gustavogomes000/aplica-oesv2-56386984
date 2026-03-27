@@ -193,7 +193,7 @@ export default function Home() {
     <div className="relative min-h-[100dvh] w-full overflow-x-hidden select-none dark"
       style={{ background: "hsl(240, 10%, 3%)" }}>
 
-      <InteractiveBackground />
+      <NeuralNetworkBg />
 
       <div className="relative z-10 flex flex-col min-h-[100dvh]">
 
