@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { toast } from "@/hooks/use-toast";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
+import NeuralNetworkBg from "@/components/NeuralNetworkBg";
 import {
   Handshake,
   ReceiptText,
@@ -101,167 +102,6 @@ const apps = [
 
 type App = (typeof apps)[number];
 
-/* ─── interactive mouse-following background ─────────────────────── */
-function InteractiveBackground() {
-  const mouseX = useMotionValue(0.5);
-  const mouseY = useMotionValue(0.5);
-  const smoothX = useSpring(mouseX, { stiffness: 50, damping: 30 });
-  const smoothY = useSpring(mouseY, { stiffness: 50, damping: 30 });
-
-  const glowX = useTransform(smoothX, [0, 1], ["20%", "80%"]);
-  const glowY = useTransform(smoothY, [0, 1], ["20%", "80%"]);
-  const gridOffsetX = useTransform(smoothX, [0, 1], [0, 30]);
-  const gridOffsetY = useTransform(smoothY, [0, 1], [0, 30]);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent | TouchEvent) => {
-      const x = "touches" in e ? e.touches[0]?.clientX ?? 0 : e.clientX;
-      const y = "touches" in e ? e.touches[0]?.clientY ?? 0 : e.clientY;
-      mouseX.set(x / window.innerWidth);
-      mouseY.set(y / window.innerHeight);
-    };
-    window.addEventListener("mousemove", handler, { passive: true });
-    window.addEventListener("touchmove", handler, { passive: true });
-    return () => {
-      window.removeEventListener("mousemove", handler);
-      window.removeEventListener("touchmove", handler);
-    };
-  }, [mouseX, mouseY]);
-
-  return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-      {/* Deep base */}
-      <div className="absolute inset-0 bg-[hsl(240,20%,3%)]" />
-
-      {/* Interactive glow that follows cursor */}
-      <motion.div
-        className="absolute w-[600px] h-[600px] rounded-full opacity-[0.08]"
-        style={{
-          left: glowX,
-          top: glowY,
-          x: "-50%",
-          y: "-50%",
-          background: "radial-gradient(circle, hsl(340,82%,55%), hsl(270,76%,55%) 40%, transparent 70%)",
-          filter: "blur(40px)",
-        }}
-      />
-
-      {/* Static orbs */}
-      <div className="absolute w-[400px] h-[400px] -top-[80px] -left-[80px] rounded-full opacity-[0.06] animate-[orbFloat_15s_ease-in-out_infinite]"
-        style={{ background: "radial-gradient(circle, hsl(200,80%,50%), transparent 60%)" }} />
-      <div className="absolute w-[300px] h-[300px] bottom-[10%] right-[-60px] rounded-full opacity-[0.04] animate-[orbFloat_18s_ease-in-out_infinite_5s]"
-        style={{ background: "radial-gradient(circle, hsl(150,70%,50%), transparent 60%)" }} />
-
-      {/* Interactive parallax grid */}
-      <motion.div className="absolute inset-[-30px] opacity-[0.05]" style={{
-        x: gridOffsetX,
-        y: gridOffsetY,
-        backgroundImage: `
-          linear-gradient(hsl(200,80%,50%) 1px, transparent 1px),
-          linear-gradient(90deg, hsl(200,80%,50%) 1px, transparent 1px)
-        `,
-        backgroundSize: "50px 50px",
-      }} />
-
-      {/* Hex overlay */}
-      <div className="absolute inset-0 opacity-[0.025]" style={{
-        backgroundImage: `
-          linear-gradient(60deg, hsl(340,82%,55%) 1px, transparent 1px),
-          linear-gradient(-60deg, hsl(340,82%,55%) 1px, transparent 1px)
-        `,
-        backgroundSize: "35px 60px",
-        animation: "gridScroll 30s linear infinite",
-      }} />
-
-      {/* Dual scan lines */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute left-0 right-0 h-[2px] opacity-[0.18]"
-          style={{
-            background: "linear-gradient(90deg, transparent 5%, hsl(340,82%,55%) 20%, hsl(200,80%,50%) 50%, hsl(150,70%,50%) 80%, transparent 95%)",
-            animation: "scanLine 4s linear infinite",
-            filter: "blur(0.5px)",
-          }} />
-        <div className="absolute left-0 right-0 h-px opacity-[0.06]"
-          style={{
-            background: "linear-gradient(90deg, transparent, hsl(270,76%,55%), transparent)",
-            animation: "scanLine 9s linear infinite 3s",
-          }} />
-      </div>
-
-      {/* Vertical energy beam */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-0 bottom-0 w-[2px] opacity-[0.06]"
-          style={{
-            background: "linear-gradient(to bottom, transparent, hsl(200,80%,50%), transparent)",
-            animation: "scanLineH 11s linear infinite",
-          }} />
-      </div>
-
-      {/* Matrix data rain */}
-      {[5, 15, 28, 40, 55, 67, 78, 90].map((left, i) => (
-        <div key={`rain-${i}`} className="absolute top-0 w-px h-full"
-          style={{
-            left: `${left}%`,
-            opacity: 0.025 + (i % 3) * 0.01,
-            background: `repeating-linear-gradient(to bottom, transparent, transparent ${14 + i * 3}px, ${['hsl(200,80%,50%)','hsl(340,82%,55%)','hsl(150,70%,50%)'][i % 3]} ${14 + i * 3}px, ${['hsl(200,80%,50%)','hsl(340,82%,55%)','hsl(150,70%,50%)'][i % 3]} ${16 + i * 3}px)`,
-            animation: `dataStream ${2.5 + i * 0.5}s linear infinite ${i % 2 === 0 ? '' : 'reverse'}`,
-          }}
-        />
-      ))}
-
-      {/* Floating game particles */}
-      {Array.from({ length: 16 }).map((_, i) => (
-        <div key={`gp-${i}`}
-          className="absolute"
-          style={{
-            width: i % 4 === 0 ? "3px" : "2px",
-            height: i % 4 === 0 ? "3px" : "2px",
-            borderRadius: i % 3 === 0 ? "0" : "50%",
-            left: `${5 + i * 5.8}%`,
-            top: `${8 + (i * 29) % 82}%`,
-            background: ["hsl(340,82%,55%)", "hsl(200,80%,50%)", "hsl(150,70%,50%)", "hsl(270,76%,55%)"][i % 4],
-            opacity: 0.12 + (i % 5) * 0.06,
-            animation: `particleFloat ${2.5 + i * 0.4}s ease-in-out infinite ${i * 0.3}s`,
-            boxShadow: `0 0 ${4 + i % 3 * 2}px ${["hsl(340,82%,55%)", "hsl(200,80%,50%)", "hsl(150,70%,50%)", "hsl(270,76%,55%)"][i % 4]}40`,
-          }}
-        />
-      ))}
-
-      {/* Corner HUD brackets with pulse */}
-      <div className="absolute top-3 left-3 w-8 h-8 sm:w-12 sm:h-12 border-l-2 border-t-2 border-primary/25 rounded-tl-sm animate-[hudPulse_3s_ease-in-out_infinite]" />
-      <div className="absolute top-3 right-3 w-8 h-8 sm:w-12 sm:h-12 border-r-2 border-t-2 border-cyan-500/20 rounded-tr-sm animate-[hudPulse_3s_ease-in-out_infinite_0.8s]" />
-      <div className="absolute bottom-3 left-3 w-8 h-8 sm:w-12 sm:h-12 border-l-2 border-b-2 border-violet-500/20 rounded-bl-sm animate-[hudPulse_3s_ease-in-out_infinite_1.6s]" />
-      <div className="absolute bottom-3 right-3 w-8 h-8 sm:w-12 sm:h-12 border-r-2 border-b-2 border-emerald-500/20 rounded-br-sm animate-[hudPulse_3s_ease-in-out_infinite_2.4s]" />
-
-      {/* Circuit SVG with glow */}
-      <svg className="absolute bottom-[6%] left-[2%] w-44 h-28 sm:w-64 sm:h-36 opacity-[0.07]" viewBox="0 0 220 130">
-        <path d="M0,65 H45 L60,25 H100 L115,65 H160 L175,95 H220" fill="none" stroke="hsl(200,80%,50%)" strokeWidth="1.5"
-          strokeDasharray="8 4" style={{ animation: "circuitFlow 3s linear infinite" }} />
-        <path d="M0,95 H30 L45,55 H85 L100,95 H140 L155,25 H220" fill="none" stroke="hsl(340,82%,55%)" strokeWidth="1"
-          strokeDasharray="6 6" style={{ animation: "circuitFlow 4.5s linear infinite reverse" }} />
-        <circle cx="60" cy="25" r="3.5" fill="hsl(200,80%,50%)" className="animate-[blip_2s_ease-in-out_infinite]" />
-        <circle cx="155" cy="25" r="3" fill="hsl(340,82%,55%)" className="animate-[blip_2s_ease-in-out_infinite_1s]" />
-        <circle cx="115" cy="65" r="2.5" fill="hsl(150,70%,50%)" className="animate-[blip_2.5s_ease-in-out_infinite_0.5s]" />
-      </svg>
-
-      {/* Circuit – right */}
-      <svg className="absolute top-[30%] right-[1%] w-16 h-40 sm:w-24 sm:h-48 opacity-[0.05]" viewBox="0 0 100 200">
-        <path d="M50,0 V40 L85,55 V100 L15,115 V155 L50,170 V200" fill="none" stroke="hsl(270,76%,55%)" strokeWidth="1.5"
-          strokeDasharray="5 5" style={{ animation: "circuitFlow 5s linear infinite" }} />
-        <circle cx="85" cy="55" r="3" fill="hsl(270,76%,55%)" className="animate-[blip_3s_ease-in-out_infinite]" />
-        <circle cx="15" cy="115" r="2" fill="hsl(200,80%,50%)" className="animate-[blip_2s_ease-in-out_infinite_1.5s]" />
-      </svg>
-
-
-      {/* Noise */}
-      <div className="absolute inset-0 opacity-[0.02]" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-        backgroundSize: "128px 128px",
-      }} />
-    </div>
-  );
-}
-
 
 
 
@@ -353,7 +193,7 @@ export default function Home() {
     <div className="relative min-h-[100dvh] w-full overflow-x-hidden select-none dark"
       style={{ background: "hsl(240, 10%, 3%)" }}>
 
-      <InteractiveBackground />
+      <NeuralNetworkBg />
 
       <div className="relative z-10 flex flex-col min-h-[100dvh]">
 
@@ -394,19 +234,6 @@ export default function Home() {
                       loading="eager"
                     />
                   </div>
-                  {/* Level badge */}
-                  <motion.div
-                    className="absolute -bottom-1 -right-1 sm:-bottom-1.5 sm:-right-1.5 z-20 flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 sm:border-[3px]"
-                    style={{
-                      background: "linear-gradient(135deg, hsl(340,82%,55%), hsl(270,76%,55%))",
-                      borderColor: "hsl(240,10%,3%)",
-                      boxShadow: "0 0 12px hsl(340,82%,55%,0.4)",
-                    }}
-                    animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                  >
-                    <span className="text-[8px] sm:text-[10px] font-black text-white">99</span>
-                  </motion.div>
                 </div>
               </motion.div>
 
