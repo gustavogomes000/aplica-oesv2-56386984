@@ -123,3 +123,19 @@
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 }
+
+/* ─── Tech HUD Animations ─── */
+@keyframes scanLine {
+  0% { top: -2px; }
+  100% { top: 100%; }
+}
+
+@keyframes dataStream {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(60px); }
+}
+
+@keyframes hudPulse {
+  0%, 100% { opacity: 0.06; transform: scale(1); }
+  50% { opacity: 0.12; transform: scale(1.05); }
+}
