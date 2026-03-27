@@ -333,8 +333,6 @@ function HudStats() {
 
 /* ─── app card with XP bar ───────────────────────────────────────── */
 function AppCard({ app, index }: { app: App; index: number }) {
-  const maxXp = 1000;
-  const xpPercent = (app.xp / maxXp) * 100;
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
