@@ -334,7 +334,7 @@ export default function Home() {
                 transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.2 }}
               >
                 {/* Animated gradient ring */}
-                <div className="relative w-28 h-28 sm:w-32 sm:h-32">
+                <div className="relative w-24 h-24 sm:w-28 sm:h-28">
                   <motion.div
                     className="absolute inset-0 rounded-full"
                     style={{
