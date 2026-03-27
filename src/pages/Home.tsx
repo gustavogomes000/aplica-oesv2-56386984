@@ -47,7 +47,7 @@ const apps = [
     Icon: ClipboardCheck,
     gradient: "from-red-400 to-rose-700",
     glowColor: "hsl(350, 80%, 55%)",
-    url: "https://visitas.deputadasarelli.com.br/",
+    url: "http://visitas.deputadasarelli.com.br/",
   },
   {
     id: "suplentes",
