@@ -1,11 +1,13 @@
 {
-  "name": "Painel Admin - Dra. Fernanda Sarelli",
-  "short_name": "Painel Admin",
-  "description": "Central de Operações",
+  "name": "Central de Operações - Dra. Fernanda Sarelli",
+  "short_name": "Central Ops",
+  "description": "Central de Operações e Gestão de Campanha",
   "start_url": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "theme_color": "#ec4899",
-  "background_color": "#0f0f0f",
+  "background_color": "#070510",
+  "categories": ["productivity", "utilities"],
   "icons": [
     {
       "src": "/icon-192.png",
@@ -16,6 +18,12 @@
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
