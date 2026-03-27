@@ -388,20 +388,6 @@ function AppCard({ app, index }: { app: App; index: number }) {
             {app.desc}
           </p>
 
-          {/* XP bar - game style */}
-          <div className="flex items-center gap-1.5">
-            <div className="flex-1 h-1 rounded-full bg-white/[0.04] overflow-hidden">
-              <motion.div
-                className={`h-full rounded-full bg-gradient-to-r ${app.gradient}`}
-                initial={{ width: 0 }}
-                animate={{ width: `${xpPercent}%` }}
-                transition={{ duration: 1.5, delay: 0.3 + index * 0.1, ease: "easeOut" }}
-              />
-            </div>
-            <span className="text-[8px] font-mono text-muted-foreground/30 tabular-nums">
-              {app.xp}xp
-            </span>
-          </div>
         </div>
 
         {/* Bottom shimmer */}
