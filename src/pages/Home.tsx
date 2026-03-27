@@ -119,34 +119,22 @@ function FloatingParticles() {
   );
 }
 
-/* ─── animated mesh gradient background ─────────────────────────── */
+/* ─── static CSS background (no JS animation = much faster) ──────── */
 function MeshBackground() {
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden">
-      {/* Main gradient orbs */}
-      <motion.div
-        className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vw] rounded-full opacity-[0.12]"
-        style={{ background: "radial-gradient(circle, hsl(340, 82%, 55%), transparent 70%)" }}
-        animate={{ x: [0, 60, -30, 0], y: [0, -40, 30, 0], scale: [1, 1.15, 0.95, 1] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+      <div
+        className="absolute -top-[20%] -left-[10%] w-[70vw] h-[70vw] rounded-full opacity-[0.12] animate-pulse"
+        style={{ background: "radial-gradient(circle, hsl(340, 82%, 55%), transparent 70%)", animationDuration: "6s" }}
       />
-      <motion.div
-        className="absolute top-[30%] -right-[15%] w-[55vw] h-[55vw] rounded-full opacity-[0.08]"
-        style={{ background: "radial-gradient(circle, hsl(270, 76%, 55%), transparent 70%)" }}
-        animate={{ x: [0, -50, 25, 0], y: [0, 45, -20, 0], scale: [1, 0.9, 1.1, 1] }}
-        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+      <div
+        className="absolute top-[30%] -right-[15%] w-[55vw] h-[55vw] rounded-full opacity-[0.08] animate-pulse"
+        style={{ background: "radial-gradient(circle, hsl(270, 76%, 55%), transparent 70%)", animationDuration: "8s", animationDelay: "2s" }}
       />
-      <motion.div
-        className="absolute -bottom-[15%] left-[20%] w-[50vw] h-[50vw] rounded-full opacity-[0.06]"
-        style={{ background: "radial-gradient(circle, hsl(200, 76%, 50%), transparent 70%)" }}
-        animate={{ x: [0, 35, -45, 0], y: [0, -25, 40, 0] }}
-        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 5 }}
+      <div
+        className="absolute -bottom-[15%] left-[20%] w-[50vw] h-[50vw] rounded-full opacity-[0.06] animate-pulse"
+        style={{ background: "radial-gradient(circle, hsl(200, 76%, 50%), transparent 70%)", animationDuration: "7s", animationDelay: "4s" }}
       />
-      {/* Subtle grain */}
-      <div className="absolute inset-0 opacity-[0.015]" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-        backgroundSize: "180px 180px",
-      }} />
     </div>
   );
 }
