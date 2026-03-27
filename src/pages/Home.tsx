@@ -12,10 +12,6 @@ import {
   Sparkles,
   Shield,
   Zap,
-  Activity,
-  Wifi,
-  Database,
-  Cpu,
 } from "lucide-react";
 
 const PHOTO_URL =
@@ -255,11 +251,6 @@ function InteractiveBackground() {
         <circle cx="15" cy="115" r="2" fill="hsl(200,80%,50%)" className="animate-[blip_2s_ease-in-out_infinite_1.5s]" />
       </svg>
 
-      {/* XP bar top */}
-      <div className="absolute top-0 left-0 right-0 h-[3px] overflow-hidden">
-        <div className="h-full animate-[xpBar_6s_ease-in-out_infinite]"
-          style={{ background: "linear-gradient(90deg, hsl(340,82%,55%), hsl(270,76%,55%), hsl(200,80%,50%), hsl(150,70%,50%))" }} />
-      </div>
 
       {/* Noise */}
       <div className="absolute inset-0 opacity-[0.02]" style={{
@@ -270,71 +261,11 @@ function InteractiveBackground() {
   );
 }
 
-/* ─── animated counter ───────────────────────────────────────────── */
-function AnimatedCounter({ value, duration = 2 }: { value: number; duration?: number }) {
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    let start = 0;
-    const end = value;
-    const step = Math.max(1, Math.floor(end / (duration * 60)));
-    const timer = setInterval(() => {
-      start += step;
-      if (start >= end) {
-        setCount(end);
-        clearInterval(timer);
-      } else {
-        setCount(start);
-      }
-    }, 1000 / 60);
-    return () => clearInterval(timer);
-  }, [value, duration]);
-  return <>{count.toLocaleString("pt-BR")}</>;
-}
 
-/* ─── HUD stats bar ──────────────────────────────────────────────── */
-function HudStats() {
-  const stats = [
-    { icon: Activity, label: "Sistemas", value: 7, color: "text-emerald-400" },
-    { icon: Wifi, label: "Uptime", value: 99, suffix: "%", color: "text-cyan-400" },
-    { icon: Database, label: "Dados", value: 1284, color: "text-violet-400" },
-    { icon: Cpu, label: "XP Total", value: 5140, color: "text-primary" },
-  ];
 
-  return (
-    <motion.div
-      className="flex items-center justify-center gap-3 sm:gap-5 flex-wrap"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.9, duration: 0.5 }}
-    >
-      {stats.map((s, i) => (
-        <motion.div
-          key={s.label}
-          className="flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg border border-white/[0.06] backdrop-blur-sm"
-          style={{ background: "hsl(240 10% 6% / 0.7)" }}
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 1 + i * 0.1, type: "spring" }}
-          whileHover={{ scale: 1.08, borderColor: "rgba(255,255,255,0.15)" }}
-        >
-          <s.icon size={10} className={`${s.color} sm:w-3 sm:h-3`} />
-          <span className={`text-[9px] sm:text-[10px] font-black ${s.color} tabular-nums`}>
-            <AnimatedCounter value={s.value} />
-            {s.suffix || ""}
-          </span>
-          <span className="text-[7px] sm:text-[8px] text-muted-foreground/30 uppercase tracking-wider hidden sm:inline">
-            {s.label}
-          </span>
-        </motion.div>
-      ))}
-    </motion.div>
-  );
-}
 
 /* ─── app card with XP bar ───────────────────────────────────────── */
 function AppCard({ app, index }: { app: App; index: number }) {
-  const maxXp = 1000;
-  const xpPercent = (app.xp / maxXp) * 100;
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -390,20 +321,6 @@ function AppCard({ app, index }: { app: App; index: number }) {
             {app.desc}
           </p>
 
-          {/* XP bar - game style */}
-          <div className="flex items-center gap-1.5">
-            <div className="flex-1 h-1 rounded-full bg-white/[0.04] overflow-hidden">
-              <motion.div
-                className={`h-full rounded-full bg-gradient-to-r ${app.gradient}`}
-                initial={{ width: 0 }}
-                animate={{ width: `${xpPercent}%` }}
-                transition={{ duration: 1.5, delay: 0.3 + index * 0.1, ease: "easeOut" }}
-              />
-            </div>
-            <span className="text-[8px] font-mono text-muted-foreground/30 tabular-nums">
-              {app.xp}xp
-            </span>
-          </div>
         </div>
 
         {/* Bottom shimmer */}
@@ -556,10 +473,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* HUD Stats */}
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-3 sm:pb-5">
-            <HudStats />
-          </div>
 
           <div className="h-px mx-4 sm:mx-8 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
         </motion.header>
