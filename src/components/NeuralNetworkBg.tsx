@@ -40,11 +40,11 @@ export default function NeuralNetworkBg() {
         x, y,
         originX: x,
         originY: y,
-        vx: (Math.random() - 0.5) * 0.1,
-        vy: (Math.random() - 0.5) * 0.1,
+        vx: 0,
+        vy: 0,
         radius: 1 + Math.random() * 1.8,
         pulse: Math.random() * Math.PI * 2,
-        pulseSpeed: 0.005 + Math.random() * 0.008,
+        pulseSpeed: 0.003 + Math.random() * 0.004,
         layer: Math.floor(Math.random() * 3),
       });
     }
@@ -83,7 +83,7 @@ export default function NeuralNetworkBg() {
       const nodes = nodesRef.current;
       const mouse = mouseRef.current;
       const t = timeRef.current;
-      timeRef.current += 0.006; // Very slow time progression
+      timeRef.current += 0.003; // Ultra slow
 
       ctx.clearRect(0, 0, w, h);
 
@@ -91,14 +91,14 @@ export default function NeuralNetworkBg() {
       for (const n of nodes) {
         n.pulse += n.pulseSpeed;
 
-        // Very gentle sinusoidal drift
-        const driftX = Math.sin(t * 0.8 + n.pulse * 3) * 25;
-        const driftY = Math.cos(t * 0.6 + n.pulse * 2.5) * 25;
+        // Very slow breathing drift
+        const driftX = Math.sin(t * 0.4 + n.pulse * 2) * 12;
+        const driftY = Math.cos(t * 0.3 + n.pulse * 1.5) * 12;
         const targetX = n.originX + driftX;
         const targetY = n.originY + driftY;
 
-        n.vx += (targetX - n.x) * 0.002;
-        n.vy += (targetY - n.y) * 0.002;
+        n.vx += (targetX - n.x) * 0.001;
+        n.vy += (targetY - n.y) * 0.001;
 
         // Mouse gentle repulsion
         const dx = n.x - mouse.x;
