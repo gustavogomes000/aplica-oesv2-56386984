@@ -40,11 +40,11 @@ export default function NeuralNetworkBg() {
         x, y,
         originX: x,
         originY: y,
-        vx: (Math.random() - 0.5) * 0.1,
-        vy: (Math.random() - 0.5) * 0.1,
+        vx: 0,
+        vy: 0,
         radius: 1 + Math.random() * 1.8,
         pulse: Math.random() * Math.PI * 2,
-        pulseSpeed: 0.005 + Math.random() * 0.008,
+        pulseSpeed: 0.003 + Math.random() * 0.004,
         layer: Math.floor(Math.random() * 3),
       });
     }
