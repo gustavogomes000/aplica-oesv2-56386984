@@ -13,14 +13,14 @@ interface Node {
   layer: number;
 }
 
-const PINK = "340,82%,55%";
-const CYAN = "190,85%,50%";
-const PURPLE = "270,70%,55%";
+const PINK = "340,82%,52%";
+const CYAN = "200,70%,40%";
+const PURPLE = "270,50%,42%";
 
 const COLORS = [PINK, CYAN, PURPLE];
-const NODE_COUNT_DESKTOP = 80;
-const NODE_COUNT_MOBILE = 45;
-const CONN_DIST = 200;
+const NODE_COUNT_DESKTOP = 55;
+const NODE_COUNT_MOBILE = 30;
+const CONN_DIST = 240;
 
 export default function NeuralNetworkBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -40,11 +40,11 @@ export default function NeuralNetworkBg() {
         x, y,
         originX: x,
         originY: y,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
-        radius: 1.2 + Math.random() * 2,
+        vx: (Math.random() - 0.5) * 0.1,
+        vy: (Math.random() - 0.5) * 0.1,
+        radius: 1 + Math.random() * 1.8,
         pulse: Math.random() * Math.PI * 2,
-        pulseSpeed: 0.015 + Math.random() * 0.02,
+        pulseSpeed: 0.005 + Math.random() * 0.008,
         layer: Math.floor(Math.random() * 3),
       });
     }
@@ -83,83 +83,80 @@ export default function NeuralNetworkBg() {
       const nodes = nodesRef.current;
       const mouse = mouseRef.current;
       const t = timeRef.current;
-      timeRef.current += 0.016;
+      timeRef.current += 0.006; // Very slow time progression
 
       ctx.clearRect(0, 0, w, h);
 
-      // ── Update nodes: organic wandering ──
+      // ── Update nodes: very slow drift ──
       for (const n of nodes) {
         n.pulse += n.pulseSpeed;
 
-        // Gentle sinusoidal drift around origin
-        const driftX = Math.sin(t * 0.3 + n.pulse * 2) * 40;
-        const driftY = Math.cos(t * 0.25 + n.pulse * 1.7) * 40;
+        // Very gentle sinusoidal drift
+        const driftX = Math.sin(t * 0.8 + n.pulse * 3) * 25;
+        const driftY = Math.cos(t * 0.6 + n.pulse * 2.5) * 25;
         const targetX = n.originX + driftX;
         const targetY = n.originY + driftY;
 
-        // Spring back to drifting target
-        n.vx += (targetX - n.x) * 0.005;
-        n.vy += (targetY - n.y) * 0.005;
+        n.vx += (targetX - n.x) * 0.002;
+        n.vy += (targetY - n.y) * 0.002;
 
-        // Mouse repulsion for organic feel
+        // Mouse gentle repulsion
         const dx = n.x - mouse.x;
         const dy = n.y - mouse.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 180 && dist > 1) {
-          const force = (1 - dist / 180) * 1.5;
+        if (dist < 150 && dist > 1) {
+          const force = (1 - dist / 150) * 0.5;
           n.vx += (dx / dist) * force;
           n.vy += (dy / dist) * force;
         }
 
-        n.vx *= 0.94;
-        n.vy *= 0.94;
+        n.vx *= 0.97;
+        n.vy *= 0.97;
         n.x += n.vx;
         n.y += n.vy;
 
-        // Soft wrap
-        if (n.x < -30) { n.x = w + 30; n.originX = w + 30; }
-        if (n.x > w + 30) { n.x = -30; n.originX = -30; }
-        if (n.y < -30) { n.y = h + 30; n.originY = h + 30; }
-        if (n.y > h + 30) { n.y = -30; n.originY = -30; }
+        // Wrap
+        if (n.x < -40) { n.x = w + 40; n.originX = w + 40; }
+        if (n.x > w + 40) { n.x = -40; n.originX = -40; }
+        if (n.y < -40) { n.y = h + 40; n.originY = h + 40; }
+        if (n.y > h + 40) { n.y = -40; n.originY = -40; }
       }
 
-      // ── Draw web connections (teia) ──
+      // ── Draw web connections ──
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
           const a = nodes[i];
           const b = nodes[j];
-          const dx = a.x - b.x;
-          const dy = a.y - b.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+          const ddx = a.x - b.x;
+          const ddy = a.y - b.y;
+          const dist = Math.sqrt(ddx * ddx + ddy * ddy);
 
           if (dist < CONN_DIST) {
             const strength = 1 - dist / CONN_DIST;
-            const wave = Math.sin(t * 1.2 + i * 0.5 + j * 0.3) * 0.5 + 0.5;
-            const alpha = strength * strength * (0.08 + wave * 0.07);
-
+            const alpha = strength * strength * 0.06;
             const color = COLORS[a.layer % 3];
 
-            // Draw curved web strand
-            const midX = (a.x + b.x) / 2 + Math.sin(t * 0.6 + i + j) * 12 * strength;
-            const midY = (a.y + b.y) / 2 + Math.cos(t * 0.5 + i - j) * 12 * strength;
+            // Slightly curved web strand
+            const midX = (a.x + b.x) / 2 + Math.sin(t * 1.5 + i + j) * 6 * strength;
+            const midY = (a.y + b.y) / 2 + Math.cos(t * 1.2 + i - j) * 6 * strength;
 
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
             ctx.quadraticCurveTo(midX, midY, b.x, b.y);
             ctx.strokeStyle = `hsla(${color},${alpha})`;
-            ctx.lineWidth = strength * 1.5;
+            ctx.lineWidth = strength * 1;
             ctx.stroke();
 
-            // Signal pulse traveling along strong connections
-            if (strength > 0.45) {
-              const signalT = (t * 1.8 + i * 0.7) % 1;
+            // Slow signal on strong connections
+            if (strength > 0.5) {
+              const signalT = (t * 0.5 + i * 0.4) % 1;
               const inv = 1 - signalT;
               const sx = inv * inv * a.x + 2 * inv * signalT * midX + signalT * signalT * b.x;
               const sy = inv * inv * a.y + 2 * inv * signalT * midY + signalT * signalT * b.y;
 
               ctx.beginPath();
-              ctx.arc(sx, sy, 1.5 + strength, 0, Math.PI * 2);
-              ctx.fillStyle = `hsla(${COLORS[b.layer % 3]},${strength * 0.5})`;
+              ctx.arc(sx, sy, 1 + strength * 0.8, 0, Math.PI * 2);
+              ctx.fillStyle = `hsla(${COLORS[b.layer % 3]},${strength * 0.25})`;
               ctx.fill();
             }
           }
@@ -169,43 +166,36 @@ export default function NeuralNetworkBg() {
       // ── Draw nodes ──
       for (const n of nodes) {
         const p = Math.sin(n.pulse) * 0.5 + 0.5;
-        const r = n.radius * (0.7 + p * 0.6);
-        const alpha = 0.35 + p * 0.45;
+        const r = n.radius * (0.8 + p * 0.4);
+        const alpha = 0.2 + p * 0.25;
         const color = COLORS[n.layer % 3];
 
         // Soft glow
         ctx.beginPath();
-        ctx.arc(n.x, n.y, r * 4, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${color},${alpha * 0.05})`;
-        ctx.fill();
-
-        // Mid ring
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, r * 2, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${color},${alpha * 0.1})`;
+        ctx.arc(n.x, n.y, r * 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${color},${alpha * 0.04})`;
         ctx.fill();
 
         // Core
         ctx.beginPath();
         ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${color},${alpha * 0.8})`;
+        ctx.fillStyle = `hsla(${color},${alpha * 0.6})`;
         ctx.fill();
 
-        // Bright center
+        // Center
         ctx.beginPath();
-        ctx.arc(n.x, n.y, r * 0.35, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${color},${Math.min(alpha + 0.2, 1)})`;
+        ctx.arc(n.x, n.y, r * 0.3, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${color},${alpha * 0.9})`;
         ctx.fill();
       }
 
       // ── Mouse glow ──
       if (mouse.x > 0 && mouse.y > 0) {
-        const grad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 160);
-        grad.addColorStop(0, `hsla(${PINK},0.07)`);
-        grad.addColorStop(0.5, `hsla(${PURPLE},0.03)`);
+        const grad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 120);
+        grad.addColorStop(0, `hsla(${PINK},0.04)`);
         grad.addColorStop(1, "transparent");
         ctx.fillStyle = grad;
-        ctx.fillRect(mouse.x - 160, mouse.y - 160, 320, 320);
+        ctx.fillRect(mouse.x - 120, mouse.y - 120, 240, 240);
       }
 
       animRef.current = requestAnimationFrame(draw);
@@ -225,7 +215,7 @@ export default function NeuralNetworkBg() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 z-0 pointer-events-none"
-      style={{ background: "linear-gradient(180deg, hsl(240,15%,4%) 0%, hsl(235,18%,6%) 50%, hsl(240,15%,4%) 100%)" }}
+      style={{ background: "linear-gradient(180deg, hsl(235,18%,3%) 0%, hsl(240,15%,5%) 50%, hsl(235,18%,3%) 100%)" }}
     />
   );
 }
