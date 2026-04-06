@@ -2,70 +2,68 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 220 20% 15%;
+    --background: 340 40% 97%;
+    --foreground: 340 20% 15%;
     --card: 0 0% 100%;
-    --card-foreground: 220 20% 15%;
+    --card-foreground: 340 20% 15%;
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 15%;
-    --primary: 340 82% 55%;
+    --popover-foreground: 340 20% 15%;
+    --primary: 340 82% 52%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 340 30% 96%;
-    --secondary-foreground: 220 20% 25%;
-    --muted: 220 10% 96%;
-    --muted-foreground: 220 10% 45%;
-    --accent: 340 82% 55%;
+    --secondary: 340 30% 94%;
+    --secondary-foreground: 340 20% 25%;
+    --muted: 340 20% 94%;
+    --muted-foreground: 340 10% 45%;
+    --accent: 340 82% 52%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 10% 90%;
-    --input: 220 10% 90%;
-    --ring: 340 82% 55%;
+    --border: 340 20% 88%;
+    --input: 340 20% 90%;
+    --ring: 340 82% 52%;
     --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 340 82% 55%;
+    --sidebar-background: 340 30% 97%;
+    --sidebar-foreground: 340 10% 26%;
+    --sidebar-primary: 340 82% 52%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 340 30% 96%;
-    --sidebar-accent-foreground: 340 82% 55%;
-    --sidebar-border: 220 10% 90%;
-    --sidebar-ring: 340 82% 55%;
+    --sidebar-accent: 340 30% 94%;
+    --sidebar-accent-foreground: 340 82% 52%;
+    --sidebar-border: 340 20% 88%;
+    --sidebar-ring: 340 82% 52%;
   }
 
   .dark {
-    --background: 240 10% 6%;
-    --foreground: 0 0% 95%;
-    --card: 240 10% 9%;
-    --card-foreground: 0 0% 95%;
-    --popover: 240 10% 9%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 340 82% 60%;
+    --background: 340 40% 97%;
+    --foreground: 340 20% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 340 20% 15%;
+    --primary: 340 82% 52%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 340 20% 15%;
-    --secondary-foreground: 0 0% 90%;
-    --muted: 240 8% 14%;
-    --muted-foreground: 220 10% 55%;
-    --accent: 340 82% 60%;
+    --secondary: 340 30% 94%;
+    --secondary-foreground: 340 20% 25%;
+    --muted: 340 20% 94%;
+    --muted-foreground: 340 10% 45%;
+    --accent: 340 82% 52%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 240 8% 16%;
-    --input: 240 8% 16%;
-    --ring: 340 82% 60%;
+    --border: 340 20% 88%;
+    --input: 340 20% 90%;
+    --ring: 340 82% 52%;
 
-    --sidebar-background: 240 10% 6%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 340 82% 60%;
+    --sidebar-background: 340 30% 97%;
+    --sidebar-foreground: 340 10% 26%;
+    --sidebar-primary: 340 82% 52%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 8% 14%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 240 8% 16%;
-    --sidebar-ring: 340 82% 60%;
+    --sidebar-accent: 340 30% 94%;
+    --sidebar-accent-foreground: 340 82% 52%;
+    --sidebar-border: 340 20% 88%;
+    --sidebar-ring: 340 82% 52%;
   }
 }
 
@@ -124,56 +122,17 @@
   }
 }
 
-/* ─── Game/Tech HUD Animations ─── */
-
-@keyframes scanLine {
-  0% { top: -2px; }
-  100% { top: 100%; }
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-@keyframes scanLineH {
-  0% { left: -2px; }
-  100% { left: 100%; }
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
-@keyframes dataStream {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(60px); }
-}
-
-@keyframes hudPulse {
-  0%, 100% { opacity: 0.06; transform: scale(1); }
-  50% { opacity: 0.15; transform: scale(1.08); }
-}
-
-@keyframes blip {
-  0%, 100% { opacity: 0.1; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1.4); }
-}
-
-@keyframes circuitFlow {
-  0% { stroke-dashoffset: 0; }
-  100% { stroke-dashoffset: 24; }
-}
-
-@keyframes orbFloat {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -20px) scale(1.05); }
-  66% { transform: translate(-20px, 15px) scale(0.95); }
-}
-
-@keyframes particleFloat {
-  0%, 100% { transform: translateY(0) scale(1); opacity: 0.15; }
-  50% { transform: translateY(-15px) scale(1.3); opacity: 0.4; }
-}
-
-@keyframes gridScroll {
-  0% { background-position: 0 0; }
-  100% { background-position: 50px 50px; }
-}
-
-@keyframes xpBar {
-  0% { width: 0%; opacity: 0.3; }
-  50% { width: 100%; opacity: 0.8; }
-  100% { width: 0%; opacity: 0.3; }
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
 }
