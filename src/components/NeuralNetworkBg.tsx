@@ -18,16 +18,16 @@ const ROSE = "350,60%,72%";
 const MAGENTA = "330,55%,60%";
 
 const COLORS = [PINK, ROSE, MAGENTA];
-const NODE_COUNT_DESKTOP = 45;
-const NODE_COUNT_MOBILE = 25;
-const CONN_DIST = 220;
+const NODE_COUNT_DESKTOP = 35;
+const NODE_COUNT_MOBILE = 18;
+const CONN_DIST = 200;
 
 export default function NeuralNetworkBg() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nodesRef = useRef<Node[]>([]);
-  const mouseRef = useRef({ x: -1000, y: -1000 });
   const animRef = useRef(0);
   const timeRef = useRef(0);
+  const visibleRef = useRef(true);
 
   const initNodes = useCallback((w: number, h: number) => {
     const count = w < 640 ? NODE_COUNT_MOBILE : NODE_COUNT_DESKTOP;
@@ -54,7 +54,7 @@ export default function NeuralNetworkBg() {
     if (!ctx) return;
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
       canvas.style.width = `${window.innerWidth}px`;
@@ -65,42 +65,47 @@ export default function NeuralNetworkBg() {
     resize();
     window.addEventListener("resize", resize);
 
-    const handleMouse = (e: MouseEvent | TouchEvent) => {
-      const x = "touches" in e ? e.touches[0]?.clientX ?? -1000 : e.clientX;
-      const y = "touches" in e ? e.touches[0]?.clientY ?? -1000 : e.clientY;
-      mouseRef.current = { x, y };
+    // Pause when tab not visible
+    const onVisibility = () => {
+      visibleRef.current = !document.hidden;
+      if (visibleRef.current && !animRef.current) {
+        animRef.current = requestAnimationFrame(draw);
+      }
     };
-    window.addEventListener("mousemove", handleMouse, { passive: true });
-    window.addEventListener("touchmove", handleMouse, { passive: true });
+    document.addEventListener("visibilitychange", onVisibility);
 
-    const draw = () => {
+    let lastFrame = 0;
+    const TARGET_FPS = 24; // Lower FPS for background effect
+    const FRAME_INTERVAL = 1000 / TARGET_FPS;
+
+    const draw = (timestamp: number = 0) => {
+      if (!visibleRef.current) {
+        animRef.current = 0;
+        return;
+      }
+
+      const delta = timestamp - lastFrame;
+      if (delta < FRAME_INTERVAL) {
+        animRef.current = requestAnimationFrame(draw);
+        return;
+      }
+      lastFrame = timestamp;
+
       const w = window.innerWidth;
       const h = window.innerHeight;
       const nodes = nodesRef.current;
-      const mouse = mouseRef.current;
       const t = timeRef.current;
-      timeRef.current += 0.002;
+      timeRef.current += 0.003;
 
       ctx.clearRect(0, 0, w, h);
 
+      // Update nodes
       for (const n of nodes) {
         n.pulse += n.pulseSpeed;
         const driftX = Math.sin(t * 0.3 + n.pulse * 2) * 15;
         const driftY = Math.cos(t * 0.25 + n.pulse * 1.5) * 15;
-        const targetX = n.originX + driftX;
-        const targetY = n.originY + driftY;
-        n.vx += (targetX - n.x) * 0.0008;
-        n.vy += (targetY - n.y) * 0.0008;
-
-        const dx = n.x - mouse.x;
-        const dy = n.y - mouse.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 150 && dist > 1) {
-          const force = (1 - dist / 150) * 0.4;
-          n.vx += (dx / dist) * force;
-          n.vy += (dy / dist) * force;
-        }
-
+        n.vx += (n.originX + driftX - n.x) * 0.0008;
+        n.vy += (n.originY + driftY - n.y) * 0.0008;
         n.vx *= 0.97;
         n.vy *= 0.97;
         n.x += n.vx;
@@ -123,7 +128,7 @@ export default function NeuralNetworkBg() {
             const alpha = strength * strength * 0.12;
             const color = COLORS[a.layer % 3];
             const midX = (a.x + b.x) / 2 + Math.sin(t * 1.2 + i + j) * 5 * strength;
-            const midY = (a.y + b.y) / 2 + Math.cos(t * 1 + i - j) * 5 * strength;
+            const midY = (a.y + b.y) / 2 + Math.cos(t + i - j) * 5 * strength;
 
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
@@ -131,17 +136,6 @@ export default function NeuralNetworkBg() {
             ctx.strokeStyle = `hsla(${color},${alpha})`;
             ctx.lineWidth = strength * 1.2;
             ctx.stroke();
-
-            if (strength > 0.55) {
-              const signalT = (t * 0.4 + i * 0.3) % 1;
-              const inv = 1 - signalT;
-              const sx = inv * inv * a.x + 2 * inv * signalT * midX + signalT * signalT * b.x;
-              const sy = inv * inv * a.y + 2 * inv * signalT * midY + signalT * signalT * b.y;
-              ctx.beginPath();
-              ctx.arc(sx, sy, 1.5 + strength, 0, Math.PI * 2);
-              ctx.fillStyle = `hsla(${COLORS[b.layer % 3]},${strength * 0.3})`;
-              ctx.fill();
-            }
           }
         }
       }
@@ -154,7 +148,7 @@ export default function NeuralNetworkBg() {
         const color = COLORS[n.layer % 3];
 
         ctx.beginPath();
-        ctx.arc(n.x, n.y, r * 4, 0, Math.PI * 2);
+        ctx.arc(n.x, n.y, r * 3, 0, Math.PI * 2);
         ctx.fillStyle = `hsla(${color},${alpha * 0.06})`;
         ctx.fill();
 
@@ -162,20 +156,6 @@ export default function NeuralNetworkBg() {
         ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
         ctx.fillStyle = `hsla(${color},${alpha * 0.5})`;
         ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, r * 0.35, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${color},${alpha * 0.8})`;
-        ctx.fill();
-      }
-
-      // Mouse glow
-      if (mouse.x > 0 && mouse.y > 0) {
-        const grad = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 130);
-        grad.addColorStop(0, `hsla(${PINK},0.06)`);
-        grad.addColorStop(1, "transparent");
-        ctx.fillStyle = grad;
-        ctx.fillRect(mouse.x - 130, mouse.y - 130, 260, 260);
       }
 
       animRef.current = requestAnimationFrame(draw);
@@ -186,8 +166,7 @@ export default function NeuralNetworkBg() {
     return () => {
       cancelAnimationFrame(animRef.current);
       window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", handleMouse);
-      window.removeEventListener("touchmove", handleMouse);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, [initNodes]);
 
@@ -195,6 +174,7 @@ export default function NeuralNetworkBg() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 z-0 pointer-events-none"
+      aria-hidden="true"
       style={{
         background: "radial-gradient(ellipse at 50% 30%, hsl(340,60%,95%) 0%, hsl(340,40%,93%) 40%, hsl(340,30%,90%) 100%)",
       }}
