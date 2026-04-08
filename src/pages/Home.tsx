@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import NeuralNetworkBg from "@/components/NeuralNetworkBg";
 import SplashScreen from "@/components/SplashScreen";
@@ -19,6 +19,8 @@ import {
   BrainCircuit,
   LogOut,
   Loader2,
+  Clock,
+  Sparkles,
 } from "lucide-react";
 
 const PHOTO_URL =
@@ -31,9 +33,8 @@ const apps = [
     desc: "Cadastro de lideranças da campanha",
     badge: "Articulação",
     Icon: Handshake,
-    gradient: "from-primary to-accent",
-    iconBg: "bg-gradient-to-br from-primary to-accent",
-    url: "https://rede.deputadasarelli.com.br/",
+    gradient: "from-pink-500 to-rose-400",
+    accentColor: "hsl(340, 82%, 52%)",
   },
   {
     id: "contas-pagar",
@@ -42,8 +43,7 @@ const apps = [
     badge: "Finanças",
     Icon: ReceiptText,
     gradient: "from-violet-500 to-purple-600",
-    iconBg: "bg-gradient-to-br from-violet-500 to-purple-600",
-    url: "https://contas.deputadasarelli.com.br",
+    accentColor: "hsl(270, 70%, 55%)",
   },
   {
     id: "visitas",
@@ -51,9 +51,8 @@ const apps = [
     desc: "Registros de visitas ao escritório",
     badge: "Escritório",
     Icon: ClipboardCheck,
-    gradient: "from-rose-400 to-primary",
-    iconBg: "bg-gradient-to-br from-rose-400 to-primary",
-    url: "https://visitas.deputadasarelli.com.br/",
+    gradient: "from-rose-400 to-pink-500",
+    accentColor: "hsl(350, 70%, 60%)",
   },
   {
     id: "pagamentos",
@@ -62,8 +61,7 @@ const apps = [
     badge: "Financeiro",
     Icon: UserRoundPlus,
     gradient: "from-pink-400 to-fuchsia-600",
-    iconBg: "bg-gradient-to-br from-pink-400 to-fuchsia-600",
-    url: "https://pagamentos.deputadasarelli.com.br/",
+    accentColor: "hsl(320, 70%, 55%)",
   },
   {
     id: "computadores",
@@ -72,8 +70,7 @@ const apps = [
     badge: "TI",
     Icon: Laptop,
     gradient: "from-indigo-400 to-blue-600",
-    iconBg: "bg-gradient-to-br from-indigo-400 to-blue-600",
-    url: "https://computadores.deputadasarelli.com.br/",
+    accentColor: "hsl(230, 70%, 55%)",
   },
   {
     id: "dados",
@@ -82,8 +79,7 @@ const apps = [
     badge: "Analytics",
     Icon: BarChart3,
     gradient: "from-teal-400 to-cyan-600",
-    iconBg: "bg-gradient-to-br from-teal-400 to-cyan-600",
-    url: "https://paineldedados.deputadasarelli.com.br/",
+    accentColor: "hsl(180, 60%, 45%)",
   },
   {
     id: "sindspag",
@@ -92,8 +88,7 @@ const apps = [
     badge: "Sindicato",
     Icon: Building2,
     gradient: "from-amber-400 to-orange-600",
-    iconBg: "bg-gradient-to-br from-amber-400 to-orange-600",
-    url: "https://sindspag.deputadasarelli.com.br/",
+    accentColor: "hsl(30, 80%, 55%)",
   },
   {
     id: "ia-eleicoes",
@@ -102,8 +97,7 @@ const apps = [
     badge: "IA",
     Icon: BrainCircuit,
     gradient: "from-emerald-400 to-teal-600",
-    iconBg: "bg-gradient-to-br from-emerald-400 to-teal-600",
-    url: "https://iaeleicoes.deputadasarelli.com.br/",
+    accentColor: "hsl(160, 60%, 45%)",
   },
   {
     id: "site",
@@ -111,71 +105,37 @@ const apps = [
     desc: "Portal institucional da campanha",
     badge: "Presença",
     Icon: Globe,
-    gradient: "from-primary/80 to-primary",
-    iconBg: "bg-gradient-to-br from-primary/80 to-primary",
-    url: "https://www.deputadasarelli.com.br",
+    gradient: "from-pink-500/80 to-pink-500",
+    accentColor: "hsl(340, 82%, 52%)",
   },
 ] as const;
 
+const APP_URLS: Record<string, string> = {
+  rede: "https://rede.deputadasarelli.com.br/",
+  "contas-pagar": "https://contas.deputadasarelli.com.br",
+  visitas: "https://visitas.deputadasarelli.com.br/",
+  pagamentos: "https://pagamentos.deputadasarelli.com.br/",
+  computadores: "https://computadores.deputadasarelli.com.br/",
+  dados: "https://paineldedados.deputadasarelli.com.br/",
+  sindspag: "https://sindspag.deputadasarelli.com.br/",
+  "ia-eleicoes": "https://iaeleicoes.deputadasarelli.com.br/",
+  site: "https://www.deputadasarelli.com.br",
+};
+
 type App = (typeof apps)[number];
 
-/* ─── Card ─── */
-function AppCard({ app, index, onOpen }: { app: App; index: number; onOpen: (app: App) => void }) {
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    onOpen(app);
-  };
+/* ─── Recent apps tracking ─── */
+function getRecentApps(): string[] {
+  try {
+    const raw = localStorage.getItem("recent_apps");
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
 
-  return (
-    <motion.a
-      href={app.url}
-      onClick={handleClick}
-      aria-label={`Abrir ${app.title} — ${app.desc}`}
-      className="group relative block cursor-pointer min-h-[72px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-2xl"
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.35,
-        delay: 0.03 * index + 0.15,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      whileHover={{ y: -3, scale: 1.015 }}
-      whileTap={{ scale: 0.97 }}
-    >
-      <div className="relative overflow-hidden rounded-2xl bg-card border border-border/60 shadow-sm transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/15 group-hover:border-primary/30">
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-400 pointer-events-none bg-gradient-to-br from-secondary/40 via-transparent to-secondary/20" />
-
-        <div className="relative p-4 sm:p-5">
-          <div className="flex items-start justify-between mb-3">
-            <div
-              className={`flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl ${app.iconBg} shadow-md`}
-            >
-              <app.Icon size={20} strokeWidth={1.8} className="text-primary-foreground" />
-            </div>
-            <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-primary/70 bg-secondary border border-border px-2 py-0.5 rounded-full">
-              {app.badge}
-            </span>
-          </div>
-
-          <h3 className="text-sm sm:text-base font-bold text-card-foreground mb-1 flex items-center gap-1.5">
-            {app.title}
-            <ArrowUpRight
-              size={14}
-              className="text-primary/30 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200"
-            />
-          </h3>
-
-          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-2">
-            {app.desc}
-          </p>
-        </div>
-
-        <div
-          className={`h-[3px] w-full bg-gradient-to-r ${app.gradient} transition-transform duration-300 origin-left scale-x-0 group-hover:scale-x-100`}
-        />
-      </div>
-    </motion.a>
-  );
+function trackAppUsage(appId: string) {
+  const recent = getRecentApps().filter((id) => id !== appId);
+  recent.unshift(appId);
+  localStorage.setItem("recent_apps", JSON.stringify(recent.slice(0, 9)));
 }
 
 /* ─── Greeting ─── */
@@ -186,6 +146,155 @@ function getGreeting() {
   return "Boa noite";
 }
 
+/* ─── Glassmorphic App Tile ─── */
+function AppTile({
+  app,
+  index,
+  isRecent,
+  onOpen,
+}: {
+  app: App;
+  index: number;
+  isRecent?: boolean;
+  onOpen: (app: App) => void;
+}) {
+  return (
+    <motion.button
+      onClick={() => onOpen(app)}
+      aria-label={`Abrir ${app.title}`}
+      className="group relative text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-2xl"
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{
+        duration: 0.4,
+        delay: 0.04 * index + 0.1,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      whileHover={{ y: -4, scale: 1.02 }}
+      whileTap={{ scale: 0.96 }}
+    >
+      <div
+        className="relative overflow-hidden rounded-2xl border border-border/40 backdrop-blur-xl h-full transition-all duration-500"
+        style={{
+          background: `linear-gradient(145deg, hsl(340 40% 97% / 0.9), hsl(340 40% 97% / 0.6))`,
+        }}
+      >
+        {/* Accent glow on hover */}
+        <div
+          className="absolute -top-12 -right-12 w-32 h-32 rounded-full opacity-0 group-hover:opacity-30 transition-opacity duration-500 blur-2xl pointer-events-none"
+          style={{ background: app.accentColor }}
+        />
+
+        {/* Bottom accent line */}
+        <div
+          className={`absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r ${app.gradient} transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}
+        />
+
+        <div className="relative p-4">
+          {/* Icon + Badge row */}
+          <div className="flex items-center justify-between mb-3">
+            <div
+              className={`flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br ${app.gradient} shadow-lg`}
+              style={{ boxShadow: `0 4px 14px ${app.accentColor}40` }}
+            >
+              <app.Icon size={18} strokeWidth={1.8} className="text-white" />
+            </div>
+
+            <div className="flex items-center gap-1">
+              {isRecent && (
+                <span className="flex items-center gap-0.5 text-[9px] font-bold uppercase tracking-wider text-primary/50 bg-primary/8 px-1.5 py-0.5 rounded-full">
+                  <Clock size={8} />
+                </span>
+              )}
+              <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/70 bg-muted/50 px-2 py-0.5 rounded-full">
+                {app.badge}
+              </span>
+            </div>
+          </div>
+
+          {/* Title */}
+          <h3 className="text-[13px] font-bold text-foreground mb-0.5 flex items-center gap-1">
+            {app.title}
+            <ArrowUpRight
+              size={12}
+              className="text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300"
+            />
+          </h3>
+
+          <p className="text-[11px] text-muted-foreground/70 leading-snug line-clamp-1">
+            {app.desc}
+          </p>
+        </div>
+      </div>
+    </motion.button>
+  );
+}
+
+/* ─── Featured Tile (big card for top recent) ─── */
+function FeaturedTile({
+  app,
+  onOpen,
+}: {
+  app: App;
+  onOpen: (app: App) => void;
+}) {
+  return (
+    <motion.button
+      onClick={() => onOpen(app)}
+      aria-label={`Abrir ${app.title}`}
+      className="group relative text-left w-full focus-visible:outline-none rounded-2xl"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -3, scale: 1.01 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      <div
+        className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${app.gradient} p-[1px]`}
+      >
+        <div
+          className="relative rounded-[15px] overflow-hidden px-5 py-4"
+          style={{
+            background: `linear-gradient(145deg, hsl(340 40% 97% / 0.95), hsl(340 40% 97% / 0.85))`,
+          }}
+        >
+          {/* Subtle glow */}
+          <div
+            className="absolute -top-20 -right-20 w-48 h-48 rounded-full opacity-20 blur-3xl pointer-events-none"
+            style={{ background: app.accentColor }}
+          />
+
+          <div className="relative flex items-center gap-4">
+            <div
+              className={`flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${app.gradient} shadow-xl shrink-0`}
+              style={{ boxShadow: `0 8px 24px ${app.accentColor}50` }}
+            >
+              <app.Icon size={24} strokeWidth={1.6} className="text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-0.5">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-primary/60 bg-primary/8 px-2 py-0.5 rounded-full">
+                  Último acesso
+                </span>
+              </div>
+              <h3 className="text-base font-bold text-foreground flex items-center gap-1.5">
+                {app.title}
+                <ArrowUpRight
+                  size={14}
+                  className="text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300"
+                />
+              </h3>
+              <p className="text-xs text-muted-foreground/70 line-clamp-1">
+                {app.desc}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.button>
+  );
+}
+
 /* ─── Home ─── */
 export default function Home() {
   const { user, usuario, loading: authLoading, signIn, signOut } = useAuth();
@@ -194,17 +303,14 @@ export default function Home() {
   const [openApp, setOpenApp] = useState<App | null>(null);
   const autoLoginAttempted = useRef(false);
 
-  // Splash screen timer — minimum 1.5s then wait for auth
+  // Splash screen timer
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (!authLoading && !autoLogging) {
-        setShowSplash(false);
-      }
+      if (!authLoading && !autoLogging) setShowSplash(false);
     }, 1500);
     return () => clearTimeout(timer);
   }, [authLoading, autoLogging]);
 
-  // Also dismiss splash when auth finishes after the minimum time
   useEffect(() => {
     if (!authLoading && !autoLogging) {
       const timer = setTimeout(() => setShowSplash(false), 300);
@@ -212,7 +318,7 @@ export default function Home() {
     }
   }, [authLoading, autoLogging]);
 
-  // Auto-login if saved credentials exist
+  // Auto-login
   useEffect(() => {
     if (autoLoginAttempted.current || authLoading || user) return;
     const savedUser = localStorage.getItem("saved_user");
@@ -247,19 +353,41 @@ export default function Home() {
   }, []);
 
   const handleOpenApp = useCallback((app: App) => {
+    trackAppUsage(app.id);
     setOpenApp(app);
   }, []);
+
+  // Sort apps: most recent first, rest in original order
+  const { featuredApp, recentIds, sortedApps } = useMemo(() => {
+    const recent = getRecentApps();
+    const featured = recent.length > 0 ? apps.find((a) => a.id === recent[0]) : null;
+    const recentSet = new Set(recent);
+
+    const sorted = [...apps].sort((a, b) => {
+      const aIdx = recent.indexOf(a.id);
+      const bIdx = recent.indexOf(b.id);
+      if (aIdx !== -1 && bIdx !== -1) return aIdx - bIdx;
+      if (aIdx !== -1) return -1;
+      if (bIdx !== -1) return 1;
+      return 0;
+    });
+
+    // Remove featured from sorted
+    const remaining = featured ? sorted.filter((a) => a.id !== featured.id) : sorted;
+
+    return {
+      featuredApp: featured || null,
+      recentIds: recentSet,
+      sortedApps: remaining,
+    };
+  }, [openApp]); // re-sort when app closes
 
   return (
     <>
       {/* Splash Screen */}
       <AnimatePresence>
         {showSplash && (
-          <motion.div
-            key="splash"
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-          >
+          <motion.div key="splash" exit={{ opacity: 0 }} transition={{ duration: 0.4 }}>
             <SplashScreen />
           </motion.div>
         )}
@@ -270,8 +398,11 @@ export default function Home() {
         {openApp && (
           <AppWebView
             key={openApp.id}
-            url={openApp.url}
+            url={APP_URLS[openApp.id]}
             title={openApp.title}
+            accentColor={openApp.accentColor}
+            gradient={openApp.gradient}
+            Icon={openApp.Icon}
             onClose={() => setOpenApp(null)}
           />
         )}
@@ -290,32 +421,33 @@ export default function Home() {
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  className="w-full bg-card/80 backdrop-blur-xl border-b border-border/50"
+                  className="w-full backdrop-blur-2xl border-b border-border/30"
+                  style={{ background: "hsl(340 40% 97% / 0.7)" }}
                 >
-                  <div className="max-w-2xl mx-auto px-5 sm:px-6 py-2.5 flex items-center justify-between">
+                  <div className="max-w-2xl mx-auto px-5 sm:px-6 py-2 flex items-center justify-between">
                     {autoLogging ? (
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Loader2 size={14} className="animate-spin" />
-                        <span>Entrando automaticamente...</span>
+                        <Loader2 size={14} className="animate-spin text-primary" />
+                        <span>Entrando...</span>
                       </div>
                     ) : user && usuario ? (
                       <>
-                        <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-                            <span className="text-[11px] font-bold text-primary-foreground">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-md">
+                            <span className="text-xs font-black text-primary-foreground">
                               {usuario.nome.charAt(0).toUpperCase()}
                             </span>
                           </div>
                           <div>
-                            <p className="text-xs font-semibold text-foreground leading-tight">{usuario.nome}</p>
+                            <p className="text-xs font-bold text-foreground leading-tight">{usuario.nome}</p>
                             <p className="text-[10px] text-muted-foreground capitalize">{usuario.tipo}</p>
                           </div>
                         </div>
                         <button
                           onClick={handleSignOut}
-                          className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-destructive transition-colors px-2.5 py-1.5 rounded-lg hover:bg-destructive/10"
+                          className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-destructive transition-colors px-2.5 py-1.5 rounded-xl hover:bg-destructive/8"
                         >
-                          <LogOut size={13} />
+                          <LogOut size={12} />
                           Sair
                         </button>
                       </>
@@ -328,38 +460,39 @@ export default function Home() {
             {/* ── HERO ── */}
             <motion.header
               className="w-full"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6 }}
             >
-              <div className="max-w-2xl mx-auto px-5 sm:px-6 pt-8 pb-4 sm:pt-12 sm:pb-6">
-                <div className="flex flex-col items-center text-center">
+              <div className="max-w-2xl mx-auto px-5 sm:px-6 pt-6 pb-2 sm:pt-10 sm:pb-4">
+                <div className="flex items-center gap-4">
+                  {/* Photo */}
                   <motion.div
-                    className="relative mb-4"
+                    className="relative shrink-0"
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 0.5, delay: 0.1 }}
                   >
-                    <div className="relative w-20 h-20 sm:w-28 sm:h-28">
+                    <div className="relative w-16 h-16 sm:w-20 sm:h-20">
                       <motion.div
                         className="absolute inset-0 rounded-full"
                         style={{
                           background:
                             "conic-gradient(from 0deg, hsl(340,82%,55%), hsl(350,70%,70%), hsl(330,60%,65%), hsl(340,82%,55%))",
-                          padding: "3px",
+                          padding: "2px",
                         }}
                         animate={{ rotate: 360 }}
-                        transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                        transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
                       >
                         <div className="w-full h-full rounded-full bg-background" />
                       </motion.div>
-                      <div className="absolute inset-[5px] rounded-full overflow-hidden shadow-lg">
+                      <div className="absolute inset-[4px] rounded-full overflow-hidden shadow-lg">
                         <img
                           src={PHOTO_URL}
                           alt="Dra. Fernanda Sarelli"
                           className="w-full h-full object-cover"
-                          width={112}
-                          height={112}
+                          width={80}
+                          height={80}
                           loading="eager"
                           fetchPriority="high"
                         />
@@ -367,63 +500,70 @@ export default function Home() {
                     </div>
                   </motion.div>
 
+                  {/* Text */}
                   <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.25, duration: 0.4 }}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2, duration: 0.4 }}
+                    className="flex-1 min-w-0"
                   >
-                    <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.3em] text-primary mb-1">
-                      Doutora Fernanda
+                    <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.25em] text-primary/60 mb-0.5">
+                      {getGreeting()}
                     </p>
-                    <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
-                      SARELLI
+                    <h1 className="text-xl sm:text-2xl font-black tracking-tight text-foreground leading-none">
+                      Central de Operações
                     </h1>
-                    <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-primary/50 mt-0.5">
-                      Chama a Doutora
+                    <p className="text-[11px] sm:text-xs text-muted-foreground capitalize mt-1">
+                      {dateStr}
                     </p>
                   </motion.div>
-
-                  <motion.div
-                    className="w-48 sm:w-64 mt-4 mb-3"
-                    initial={{ scaleX: 0 }}
-                    animate={{ scaleX: 1 }}
-                    transition={{ delay: 0.4, duration: 0.5 }}
-                  >
-                    <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
-                  </motion.div>
-
-                  <motion.p
-                    className="text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-primary/60"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                  >
-                    Central de Operações
-                  </motion.p>
-
-                  <motion.p
-                    className="text-xs sm:text-sm text-muted-foreground capitalize mt-1"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.55 }}
-                  >
-                    {getGreeting()} — {dateStr}
-                  </motion.p>
                 </div>
               </div>
             </motion.header>
 
-            {/* ── APPS GRID ── */}
-            <main className="flex-1 max-w-2xl w-full mx-auto px-4 sm:px-6 py-4 sm:py-6">
+            {/* ── CONTENT ── */}
+            <main className="flex-1 max-w-2xl w-full mx-auto px-4 sm:px-6 py-3 sm:py-5 space-y-4">
+
+              {/* Featured / Last accessed */}
+              {featuredApp && (
+                <section>
+                  <FeaturedTile app={featuredApp} onOpen={handleOpenApp} />
+                </section>
+              )}
+
+              {/* Section label */}
+              <motion.div
+                className="flex items-center gap-2 px-1"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+              >
+                <Sparkles size={12} className="text-primary/40" />
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/50">
+                  {featuredApp ? "Todos os apps" : "Apps"}
+                </span>
+                <div className="flex-1 h-px bg-gradient-to-r from-border/40 to-transparent" />
+              </motion.div>
+
+              {/* App Grid */}
               <div
-                className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 [&>*:last-child:nth-child(odd)]:col-span-2 [&>*:last-child:nth-child(odd)]:sm:col-span-1"
+                className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3 [&>*:last-child:nth-child(odd)]:col-span-2 [&>*:last-child:nth-child(odd)]:sm:col-span-1"
                 role="navigation"
                 aria-label="Sistemas do ecossistema"
               >
-                {apps.map((app, i) => (
-                  <AppCard key={app.id} app={app} index={i} onOpen={handleOpenApp} />
+                {sortedApps.map((app, i) => (
+                  <AppTile
+                    key={app.id}
+                    app={app}
+                    index={i}
+                    isRecent={recentIds.has(app.id)}
+                    onOpen={handleOpenApp}
+                  />
                 ))}
               </div>
+
+              {/* Bottom spacer */}
+              <div className="h-6 safe-bottom" />
             </main>
           </div>
         </PullToRefresh>
