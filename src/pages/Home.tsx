@@ -108,9 +108,12 @@ type App = (typeof apps)[number];
 
 /* ─── Card ─── */
 function AppCard({ app, index }: { app: App; index: number }) {
+  const centralUrl = window.location.origin;
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    window.open(app.url, "_blank", "noopener,noreferrer");
+    const separator = app.url.includes("?") ? "&" : "?";
+    const urlWithRef = `${app.url}${separator}ref_central=${encodeURIComponent(centralUrl)}`;
+    window.location.href = urlWithRef;
   };
 
   return (
