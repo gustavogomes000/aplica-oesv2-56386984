@@ -1,6 +1,8 @@
-import { useEffect } from "react";
-import { motion } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import NeuralNetworkBg from "@/components/NeuralNetworkBg";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
 import {
   Handshake,
   ReceiptText,
@@ -11,6 +13,9 @@ import {
   Globe,
   ArrowUpRight,
   Building2,
+  LogIn,
+  LogOut,
+  Loader2,
 } from "lucide-react";
 
 const PHOTO_URL =
@@ -103,9 +108,12 @@ type App = (typeof apps)[number];
 
 /* ─── Card ─── */
 function AppCard({ app, index }: { app: App; index: number }) {
+  const centralUrl = window.location.origin;
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    window.open(app.url, "_blank", "noopener,noreferrer");
+    const separator = app.url.includes("?") ? "&" : "?";
+    const urlWithRef = `${app.url}${separator}ref_central=${encodeURIComponent(centralUrl)}`;
+    window.location.href = urlWithRef;
   };
 
   return (
@@ -177,7 +185,26 @@ function getGreeting() {
 
 /* ─── Home ─── */
 export default function Home() {
-  useEffect(() => {}, []);
+  const { user, usuario, loading: authLoading, signIn, signOut } = useAuth();
+  const [autoLogging, setAutoLogging] = useState(false);
+  const autoLoginAttempted = useRef(false);
+
+  // Auto-login if saved credentials exist
+  useEffect(() => {
+    if (autoLoginAttempted.current || authLoading || user) return;
+    const savedUser = localStorage.getItem("saved_user");
+    const savedPass = localStorage.getItem("saved_pass");
+    if (savedUser && savedPass) {
+      autoLoginAttempted.current = true;
+      setAutoLogging(true);
+      signIn(savedUser, savedPass).then(({ error }) => {
+        setAutoLogging(false);
+        if (error) {
+          toast({ title: "Login automático falhou", description: "Faça login novamente", variant: "destructive" });
+        }
+      });
+    }
+  }, [authLoading, user, signIn]);
 
   const dateStr = new Date().toLocaleDateString("pt-BR", {
     weekday: "long",
@@ -185,11 +212,59 @@ export default function Home() {
     month: "long",
   });
 
+  const handleSignOut = async () => {
+    localStorage.removeItem("saved_user");
+    localStorage.removeItem("saved_pass");
+    await signOut();
+  };
+
   return (
     <div className="relative min-h-[100dvh] w-full overflow-x-hidden select-none">
       <NeuralNetworkBg />
 
       <div className="relative z-10 flex flex-col min-h-[100dvh]">
+        {/* ── AUTH BAR ── */}
+        <AnimatePresence>
+          {(autoLogging || user) && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="w-full bg-card/80 backdrop-blur-xl border-b border-border/50"
+            >
+              <div className="max-w-2xl mx-auto px-5 sm:px-6 py-2.5 flex items-center justify-between">
+                {autoLogging ? (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Loader2 size={14} className="animate-spin" />
+                    <span>Entrando automaticamente...</span>
+                  </div>
+                ) : user && usuario ? (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                        <span className="text-[11px] font-bold text-primary-foreground">
+                          {usuario.nome.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-foreground leading-tight">{usuario.nome}</p>
+                        <p className="text-[10px] text-muted-foreground capitalize">{usuario.tipo}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleSignOut}
+                      className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-destructive transition-colors px-2.5 py-1.5 rounded-lg hover:bg-destructive/10"
+                    >
+                      <LogOut size={13} />
+                      Sair
+                    </button>
+                  </>
+                ) : null}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* ── HERO ── */}
         <motion.header
           className="w-full"
