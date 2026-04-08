@@ -185,13 +185,38 @@ function getGreeting() {
 
 /* ─── Home ─── */
 export default function Home() {
-  useEffect(() => {}, []);
+  const { user, usuario, loading: authLoading, signIn, signOut } = useAuth();
+  const [autoLogging, setAutoLogging] = useState(false);
+  const autoLoginAttempted = useRef(false);
+
+  // Auto-login if saved credentials exist
+  useEffect(() => {
+    if (autoLoginAttempted.current || authLoading || user) return;
+    const savedUser = localStorage.getItem("saved_user");
+    const savedPass = localStorage.getItem("saved_pass");
+    if (savedUser && savedPass) {
+      autoLoginAttempted.current = true;
+      setAutoLogging(true);
+      signIn(savedUser, savedPass).then(({ error }) => {
+        setAutoLogging(false);
+        if (error) {
+          toast({ title: "Login automático falhou", description: "Faça login novamente", variant: "destructive" });
+        }
+      });
+    }
+  }, [authLoading, user, signIn]);
 
   const dateStr = new Date().toLocaleDateString("pt-BR", {
     weekday: "long",
     day: "numeric",
     month: "long",
   });
+
+  const handleSignOut = async () => {
+    localStorage.removeItem("saved_user");
+    localStorage.removeItem("saved_pass");
+    await signOut();
+  };
 
   return (
     <div className="relative min-h-[100dvh] w-full overflow-x-hidden select-none">
