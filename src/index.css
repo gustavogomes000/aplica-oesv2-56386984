@@ -231,9 +231,34 @@
   100% { transform: translateX(300%); }
 }
 
+/* ── WebView animations ── */
+.webview-icon-pop {
+  animation: iconPop 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes iconPop {
+  from { transform: scale(0.5); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.webview-dot {
+  animation: dotPulse 1s ease-in-out infinite;
+}
+@keyframes dotPulse {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+.webview-progress {
+  animation: progressSlide 2s ease-in-out infinite;
+  background-size: 200% 100%;
+}
+@keyframes progressSlide {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
 /* Reduce motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
-  .blob, .splash-orb, .splash-loading-bar, .splash-reveal, .splash-reveal-delay {
+  .blob, .splash-orb, .splash-loading-bar, .splash-reveal, .splash-reveal-delay,
+  .webview-icon-pop, .webview-dot, .webview-progress {
     animation: none !important;
   }
 }
