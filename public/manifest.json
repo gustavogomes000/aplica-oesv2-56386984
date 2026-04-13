@@ -1,13 +1,16 @@
 {
   "name": "Central de Operações - Dra. Fernanda Sarelli",
   "short_name": "Central Ops",
-  "description": "Central de Operações e Gestão de Campanha",
-  "start_url": "/",
+  "description": "Central de Operações e Gestão",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "theme_color": "#ec4899",
-  "background_color": "#070510",
+  "theme_color": "#faf5f7",
+  "background_color": "#faf5f7",
   "categories": ["productivity", "utilities"],
+  "lang": "pt-BR",
+  "dir": "ltr",
   "icons": [
     {
       "src": "/icon-192.png",
