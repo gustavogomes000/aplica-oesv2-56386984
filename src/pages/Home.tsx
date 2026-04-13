@@ -92,10 +92,10 @@ const apps = [
     accentColor: "hsl(30, 80%, 55%)",
   },
   {
-    id: "ia-eleicoes",
-    title: "IA Eleições",
-    desc: "Inteligência artificial eleitoral",
-    badge: "IA",
+    id: "dados-eleitorais",
+    title: "Dados Eleitorais",
+    desc: "Dados e estatísticas eleitorais",
+    badge: "Eleições",
     Icon: BrainCircuit,
     gradient: "from-emerald-400 to-teal-600",
     accentColor: "hsl(160, 60%, 45%)",
@@ -119,7 +119,7 @@ const APP_URLS: Record<string, string> = {
   computadores: "https://computadores.deputadasarelli.com.br/",
   dados: "https://paineldedados.deputadasarelli.com.br/",
   sindspag: "https://sindspag.deputadasarelli.com.br/",
-  "ia-eleicoes": "https://iaeleicoes.deputadasarelli.com.br/",
+  "dados-eleitorais": "https://dadoseleitorais.deputadasarelli.com.br/",
   site: "https://www.deputadasarelli.com.br",
 };
 
