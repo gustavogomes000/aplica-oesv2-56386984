@@ -49,7 +49,6 @@ export default function AppWebView({ url, title, accentColor, gradient, Icon, on
   const touchStartY = useRef(0);
   const versionedUrl = `${url}${url.includes("?") ? "&" : "?"}central_v=${__APP_VERSION__}`;
 
-  // Swipe-back gesture (from left edge)
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
@@ -68,8 +67,10 @@ export default function AppWebView({ url, title, accentColor, gradient, Icon, on
       e.preventDefault();
       onClose();
     };
+
     window.history.pushState({ webview: true }, "");
     window.addEventListener("popstate", handler);
+
     return () => window.removeEventListener("popstate", handler);
   }, [onClose]);
 
@@ -88,7 +89,76 @@ export default function AppWebView({ url, title, accentColor, gradient, Icon, on
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-...
+      <div
+        className="flex items-center gap-2 px-3 py-2 border-b border-border/40 shrink-0"
+        style={{
+          background: "hsl(340 40% 97% / 0.95)",
+          paddingTop: "max(0.5rem, env(safe-area-inset-top))",
+        }}
+      >
+        <button
+          onClick={onClose}
+          className="flex items-center gap-1 text-sm font-semibold text-primary px-2.5 py-1.5 rounded-xl hover:bg-secondary active:scale-95 transition-all"
+        >
+          <ArrowLeft size={16} />
+          <span className="text-xs">Voltar</span>
+        </button>
+
+        <div className="flex-1 text-center flex items-center justify-center gap-2 min-w-0">
+          <div className={`w-5 h-5 rounded-md bg-gradient-to-br ${gradient} flex items-center justify-center shrink-0`}>
+            <Icon size={11} className="text-white" />
+          </div>
+          <p className="text-xs font-bold text-foreground truncate">{title}</p>
+        </div>
+
+        <div className="flex items-center gap-0.5">
+          <button
+            onClick={() => {
+              setLoading(true);
+              setIframeKey((k) => k + 1);
+            }}
+            className="p-2 rounded-xl hover:bg-secondary active:scale-95 transition-all text-muted-foreground"
+          >
+            <RefreshCw size={14} />
+          </button>
+          <a
+            href={versionedUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-2 rounded-xl hover:bg-secondary active:scale-95 transition-all text-muted-foreground"
+          >
+            <ExternalLink size={14} />
+          </a>
+        </div>
+      </div>
+
+      {loading && (
+        <div
+          className="h-[2px] shrink-0 webview-progress"
+          style={{
+            background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`,
+          }}
+        />
+      )}
+
+      <div className="relative flex-1">
+        <AnimatePresence>
+          {loading && (
+            <motion.div
+              key="loader"
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <LoadingIndicator
+                title={title}
+                accentColor={accentColor}
+                gradient={gradient}
+                Icon={Icon}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <iframe
           key={iframeKey}
           src={versionedUrl}
@@ -102,7 +172,6 @@ export default function AppWebView({ url, title, accentColor, gradient, Icon, on
         />
       </div>
 
-      {/* Swipe hint indicator — left edge */}
       <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-16 rounded-r-full bg-primary/10" />
     </motion.div>
   );
