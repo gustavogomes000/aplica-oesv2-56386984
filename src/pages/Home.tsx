@@ -463,18 +463,13 @@ export default function Home() {
               )}
 
               {/* Section label */}
-              <motion.div
-                className="flex items-center gap-2 px-1"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-              >
+              <div className="flex items-center gap-2 px-1">
                 <Sparkles size={12} className="text-primary/40" />
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/50">
                   {featuredApp ? "Todos os apps" : "Apps"}
                 </span>
                 <div className="flex-1 h-px bg-gradient-to-r from-border/40 to-transparent" />
-              </motion.div>
+              </div>
 
               {/* App Grid */}
               <div
