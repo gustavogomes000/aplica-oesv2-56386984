@@ -2,19 +2,43 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=no, viewport-fit=cover" />
     <title>Central de Operações - Dra. Fernanda Sarelli</title>
-    <meta name="description" content="Central de Operações" />
-    <meta name="theme-color" content="#ec4899" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Central Ops" />
-    <link rel="apple-touch-icon" href="/icon-192.png" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta name="description" content="Central de Operações e Gestão - Dra. Fernanda Sarelli" />
 
+    <!-- PWA & Mobile -->
+    <meta name="theme-color" content="#faf5f7" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Central Ops" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="icon" type="image/png" href="/icon-192.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Preconnect critical origins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://qtrypzzcjebvfcihiynt.supabase.co" />
+
+    <!-- DNS prefetch for app domains -->
+    <link rel="dns-prefetch" href="https://rede.deputadasarelli.com.br" />
+    <link rel="dns-prefetch" href="https://contas.deputadasarelli.com.br" />
+    <link rel="dns-prefetch" href="https://visitas.deputadasarelli.com.br" />
+    <link rel="dns-prefetch" href="https://pagamentos.deputadasarelli.com.br" />
+    <link rel="dns-prefetch" href="https://dadoseleitorais.deputadasarelli.com.br" />
+
+    <!-- OG -->
     <meta property="og:title" content="Central de Operações - Dra. Fernanda Sarelli" />
-    <meta property="og:description" content="Central de Operações" />
+    <meta property="og:description" content="Central de Operações e Gestão" />
     <meta property="og:type" content="website" />
+
+    <!-- Prevent FOUC -->
+    <style>
+      html, body { margin: 0; padding: 0; background: #faf5f7; }
+      #root { min-height: 100dvh; }
+    </style>
   </head>
 
   <body>
