@@ -428,19 +428,9 @@ export default function Home() {
             </AnimatePresence>
 
             {/* ── HERO ── */}
-            <motion.header
-              className="w-full"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6 }}
-            >
+            <header className="w-full">
               <div className="max-w-2xl mx-auto px-5 sm:px-6 pt-5 pb-1 sm:pt-8 sm:pb-3">
-                <motion.div
-                  className="flex flex-col items-center"
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.1 }}
-                >
+                <div className="flex flex-col items-center">
                   <img
                     src={logoSarelli}
                     alt="Dra. Fernanda Sarelli"
@@ -448,29 +438,19 @@ export default function Home() {
                     loading="eager"
                     fetchPriority="high"
                   />
-                  <motion.div
-                    className="flex items-center gap-3 mt-2"
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                  >
+                  <div className="flex items-center gap-3 mt-2">
                     <div className="h-px w-8 bg-gradient-to-r from-transparent to-primary/30" />
                     <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-primary/50">
                       Central de Operações
                     </p>
                     <div className="h-px w-8 bg-gradient-to-l from-transparent to-primary/30" />
-                  </motion.div>
-                  <motion.p
-                    className="text-[10px] text-muted-foreground capitalize mt-1"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                  >
+                  </div>
+                  <p className="text-[10px] text-muted-foreground capitalize mt-1">
                     {getGreeting()} — {dateStr}
-                  </motion.p>
-                </motion.div>
+                  </p>
+                </div>
               </div>
-            </motion.header>
+            </header>
 
             {/* ── CONTENT ── */}
             <main className="flex-1 max-w-2xl w-full mx-auto px-4 sm:px-6 py-3 sm:py-5 space-y-4">
