@@ -160,32 +160,15 @@ function AppTile({
   onOpen: (app: App) => void;
 }) {
   return (
-    <motion.button
+    <button
       onClick={() => onOpen(app)}
       aria-label={`Abrir ${app.title}`}
-      className="group relative text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-2xl"
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{
-        duration: 0.4,
-        delay: 0.04 * index + 0.1,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-      whileHover={{ y: -4, scale: 1.02 }}
-      whileTap={{ scale: 0.96 }}
+      className="group relative text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-2xl active:scale-[0.96] transition-transform duration-150"
+      style={{ animationDelay: `${0.03 * index}s` }}
     >
       <div
-        className="relative overflow-hidden rounded-2xl border border-border/40 backdrop-blur-xl h-full transition-all duration-500"
-        style={{
-          background: `linear-gradient(145deg, hsl(340 40% 97% / 0.9), hsl(340 40% 97% / 0.6))`,
-        }}
+        className="relative overflow-hidden rounded-2xl border border-border/40 bg-card/80 h-full transition-shadow duration-300 group-hover:shadow-lg"
       >
-        {/* Accent glow on hover */}
-        <div
-          className="absolute -top-12 -right-12 w-32 h-32 rounded-full opacity-0 group-hover:opacity-30 transition-opacity duration-500 blur-2xl pointer-events-none"
-          style={{ background: app.accentColor }}
-        />
-
         {/* Bottom accent line */}
         <div
           className={`absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r ${app.gradient} transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}
@@ -218,7 +201,7 @@ function AppTile({
             {app.title}
             <ArrowUpRight
               size={12}
-              className="text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300"
+              className="text-muted-foreground/30 group-hover:text-primary transition-colors duration-300"
             />
           </h3>
 
@@ -227,7 +210,7 @@ function AppTile({
           </p>
         </div>
       </div>
-    </motion.button>
+    </button>
   );
 }
 
@@ -240,31 +223,17 @@ function FeaturedTile({
   onOpen: (app: App) => void;
 }) {
   return (
-    <motion.button
+    <button
       onClick={() => onOpen(app)}
       aria-label={`Abrir ${app.title}`}
-      className="group relative text-left w-full focus-visible:outline-none rounded-2xl"
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -3, scale: 1.01 }}
-      whileTap={{ scale: 0.98 }}
+      className="group relative text-left w-full focus-visible:outline-none rounded-2xl active:scale-[0.98] transition-transform duration-150"
     >
       <div
         className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${app.gradient} p-[1px]`}
       >
         <div
-          className="relative rounded-[15px] overflow-hidden px-5 py-4"
-          style={{
-            background: `linear-gradient(145deg, hsl(340 40% 97% / 0.95), hsl(340 40% 97% / 0.85))`,
-          }}
+          className="relative rounded-[15px] overflow-hidden px-5 py-4 bg-card/90"
         >
-          {/* Subtle glow */}
-          <div
-            className="absolute -top-20 -right-20 w-48 h-48 rounded-full opacity-20 blur-3xl pointer-events-none"
-            style={{ background: app.accentColor }}
-          />
-
           <div className="relative flex items-center gap-4">
             <div
               className={`flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br ${app.gradient} shadow-xl shrink-0`}
@@ -282,7 +251,7 @@ function FeaturedTile({
                 {app.title}
                 <ArrowUpRight
                   size={14}
-                  className="text-muted-foreground/30 group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300"
+                  className="text-muted-foreground/30 group-hover:text-primary transition-colors duration-300"
                 />
               </h3>
               <p className="text-xs text-muted-foreground/70 line-clamp-1">
@@ -292,7 +261,7 @@ function FeaturedTile({
           </div>
         </div>
       </div>
-    </motion.button>
+    </button>
   );
 }
 
@@ -459,19 +428,9 @@ export default function Home() {
             </AnimatePresence>
 
             {/* ── HERO ── */}
-            <motion.header
-              className="w-full"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6 }}
-            >
+            <header className="w-full">
               <div className="max-w-2xl mx-auto px-5 sm:px-6 pt-5 pb-1 sm:pt-8 sm:pb-3">
-                <motion.div
-                  className="flex flex-col items-center"
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.1 }}
-                >
+                <div className="flex flex-col items-center">
                   <img
                     src={logoSarelli}
                     alt="Dra. Fernanda Sarelli"
@@ -479,29 +438,19 @@ export default function Home() {
                     loading="eager"
                     fetchPriority="high"
                   />
-                  <motion.div
-                    className="flex items-center gap-3 mt-2"
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                  >
+                  <div className="flex items-center gap-3 mt-2">
                     <div className="h-px w-8 bg-gradient-to-r from-transparent to-primary/30" />
                     <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-primary/50">
                       Central de Operações
                     </p>
                     <div className="h-px w-8 bg-gradient-to-l from-transparent to-primary/30" />
-                  </motion.div>
-                  <motion.p
-                    className="text-[10px] text-muted-foreground capitalize mt-1"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                  >
+                  </div>
+                  <p className="text-[10px] text-muted-foreground capitalize mt-1">
                     {getGreeting()} — {dateStr}
-                  </motion.p>
-                </motion.div>
+                  </p>
+                </div>
               </div>
-            </motion.header>
+            </header>
 
             {/* ── CONTENT ── */}
             <main className="flex-1 max-w-2xl w-full mx-auto px-4 sm:px-6 py-3 sm:py-5 space-y-4">
@@ -514,18 +463,13 @@ export default function Home() {
               )}
 
               {/* Section label */}
-              <motion.div
-                className="flex items-center gap-2 px-1"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-              >
+              <div className="flex items-center gap-2 px-1">
                 <Sparkles size={12} className="text-primary/40" />
                 <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/50">
                   {featuredApp ? "Todos os apps" : "Apps"}
                 </span>
                 <div className="flex-1 h-px bg-gradient-to-r from-border/40 to-transparent" />
-              </motion.div>
+              </div>
 
               {/* App Grid */}
               <div

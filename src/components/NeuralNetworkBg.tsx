@@ -1,12 +1,13 @@
-import { motion } from "framer-motion";
-
 /**
- * Premium animated background with floating gradient blobs
- * Inspired by Linear, Stripe, Vercel dashboard aesthetics
+ * Lightweight premium background — pure CSS animations, no JS overhead.
+ * Uses GPU-accelerated transforms + will-change for smooth 60fps.
  */
 export default function NeuralNetworkBg() {
   return (
-    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none" aria-hidden="true">
+    <div
+      className="fixed inset-0 z-0 overflow-hidden pointer-events-none"
+      aria-hidden="true"
+    >
       {/* Base gradient */}
       <div
         className="absolute inset-0"
@@ -27,87 +28,12 @@ export default function NeuralNetworkBg() {
         }}
       />
 
-      {/* Floating blob 1 - Large pink */}
-      <motion.div
-        className="absolute rounded-full blur-[100px]"
-        style={{
-          width: "45vw",
-          height: "45vw",
-          maxWidth: "600px",
-          maxHeight: "600px",
-          background: "radial-gradient(circle, hsla(340,85%,65%,0.18) 0%, hsla(340,80%,70%,0.05) 70%, transparent 100%)",
-          top: "-5%",
-          left: "-10%",
-        }}
-        animate={{
-          x: [0, 80, 30, 0],
-          y: [0, 60, 100, 0],
-          scale: [1, 1.15, 0.95, 1],
-        }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-      />
+      {/* CSS-only floating blobs — no framer-motion overhead */}
+      <div className="blob blob-1" />
+      <div className="blob blob-2" />
+      <div className="blob blob-3" />
 
-      {/* Floating blob 2 - Rose accent */}
-      <motion.div
-        className="absolute rounded-full blur-[120px]"
-        style={{
-          width: "40vw",
-          height: "40vw",
-          maxWidth: "500px",
-          maxHeight: "500px",
-          background: "radial-gradient(circle, hsla(350,75%,60%,0.15) 0%, hsla(350,70%,65%,0.04) 70%, transparent 100%)",
-          bottom: "-10%",
-          right: "-5%",
-        }}
-        animate={{
-          x: [0, -70, -20, 0],
-          y: [0, -80, -40, 0],
-          scale: [1, 1.1, 1.2, 1],
-        }}
-        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-      />
-
-      {/* Floating blob 3 - Purple tint */}
-      <motion.div
-        className="absolute rounded-full blur-[90px]"
-        style={{
-          width: "30vw",
-          height: "30vw",
-          maxWidth: "400px",
-          maxHeight: "400px",
-          background: "radial-gradient(circle, hsla(310,60%,70%,0.12) 0%, hsla(310,55%,75%,0.03) 70%, transparent 100%)",
-          top: "40%",
-          right: "15%",
-        }}
-        animate={{
-          x: [0, -50, 40, 0],
-          y: [0, 50, -30, 0],
-          scale: [1, 1.2, 0.9, 1],
-        }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-      />
-
-      {/* Floating blob 4 - Warm pink */}
-      <motion.div
-        className="absolute rounded-full blur-[80px]"
-        style={{
-          width: "25vw",
-          height: "25vw",
-          maxWidth: "350px",
-          maxHeight: "350px",
-          background: "radial-gradient(circle, hsla(0,65%,72%,0.1) 0%, transparent 70%)",
-          top: "60%",
-          left: "10%",
-        }}
-        animate={{
-          x: [0, 60, -30, 0],
-          y: [0, -40, 60, 0],
-          scale: [1, 0.9, 1.15, 1],
-        }}
-        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
-      />
-
-      {/* Subtle noise texture */}
+      {/* Subtle noise */}
       <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
@@ -117,7 +43,7 @@ export default function NeuralNetworkBg() {
         }}
       />
 
-      {/* Subtle grid pattern */}
+      {/* Subtle grid */}
       <div
         className="absolute inset-0 opacity-[0.025]"
         style={{
