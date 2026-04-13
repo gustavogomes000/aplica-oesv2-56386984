@@ -23,12 +23,15 @@ createRoot(document.getElementById("root")!).render(<App />);
 if (!isPreviewHost && !isInIframe && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     import("virtual:pwa-register").then(({ registerSW }) => {
-      registerSW({
+      const updateSW = registerSW({
         immediate: true,
-        onRegisteredSW(swUrl, r) {
-          // Check for updates every 30 min
+        onNeedRefresh() {
+          updateSW(true);
+        },
+        onRegisteredSW(_swUrl, r) {
           if (r) {
-            setInterval(() => r.update(), 30 * 60 * 1000);
+            r.update();
+            setInterval(() => r.update(), 5 * 60 * 1000);
           }
         },
         onOfflineReady() {
